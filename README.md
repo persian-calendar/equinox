@@ -41,7 +41,7 @@ allprojects {
 Add the dependency
 ```
 dependencies {
-    implementation 'com.github.persian-calendar:equinox:1.0.0'
+    implementation 'com.github.persian-calendar:equinox:1.0.1'
 }
 ```
  
