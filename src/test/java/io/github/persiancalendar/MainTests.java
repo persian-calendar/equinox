@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class MainLogicTests {
+public class MainTests {
     @Test
     public final void test_equinox_time() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tehran"));
