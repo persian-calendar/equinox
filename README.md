@@ -30,18 +30,18 @@ SOFTWARE.
 # Usage
 ### Gradle
 Add it in your root build.gradle at the end of repositories:
-```groovy
+```kotlin
 allprojects {
     repositories {
         ...
-        maven { url 'https://jitpack.io' }
+        maven("https://jitpack.io")
     }
 }
 ```  
 Add the dependency
-```
+```kotlin
 dependencies {
-    implementation 'com.github.persian-calendar:equinox:1.0.1'
+    implementation("com.github.persian-calendar:equinox:1.0.2")
 }
 ```
  
