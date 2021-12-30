@@ -1,10 +1,11 @@
 package io.github.persiancalendar;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Calendar;
 import java.util.TimeZone;
+
+import static org.junit.Assert.assertEquals;
 
 public class MainTests {
     @Test
@@ -57,17 +58,22 @@ public class MainTests {
 
         for (int[] item : elements) {
             calendar.setTime(Equinox.northwardEquinox(item[0]));
-            Assert.assertEquals(String.valueOf(item[0]), item[0], calendar.get(Calendar.YEAR));
-            Assert.assertEquals(String.valueOf(item[0]), item[1], calendar.get(Calendar.MONTH) + 1);
-            Assert.assertEquals(String.valueOf(item[0]), item[2], calendar.get(Calendar.DAY_OF_MONTH));
-            Assert.assertEquals(String.valueOf(item[0]), item[3], calendar.get(Calendar.HOUR_OF_DAY));
-            Assert.assertEquals(String.valueOf(item[0]), item[4], calendar.get(Calendar.MINUTE));
-            Assert.assertEquals(String.valueOf(item[0]), item[5], calendar.get(Calendar.SECOND));
+            assertEquals(String.valueOf(item[0]), item[0], calendar.get(Calendar.YEAR));
+            assertEquals(String.valueOf(item[0]), item[1], calendar.get(Calendar.MONTH) + 1);
+            assertEquals(String.valueOf(item[0]), item[2], calendar.get(Calendar.DAY_OF_MONTH));
+            assertEquals(String.valueOf(item[0]), item[3], calendar.get(Calendar.HOUR_OF_DAY));
+            assertEquals(String.valueOf(item[0]), item[4], calendar.get(Calendar.MINUTE));
+            assertEquals(String.valueOf(item[0]), item[5], calendar.get(Calendar.SECOND));
         }
 
         // And not having random crashes
         for (int i = -2000; i <= 10000; i++) {
             Equinox.northwardEquinox(i);
         }
+
+        assertEquals(1584676183400L, Equinox.northwardEquinox(2020).getTime());
+        assertEquals(1592689390621L, Equinox.northernSolstice(2020).getTime());
+        assertEquals(1600781435095L, Equinox.southwardEquinox(2020).getTime());
+        assertEquals(1608544954756L, Equinox.southernSolstice(2020).getTime());
     }
 }
