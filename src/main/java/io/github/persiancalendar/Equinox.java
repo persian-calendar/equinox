@@ -69,23 +69,17 @@ public class Equinox {
         double l = 24.0 * (d + 0.5 - e);
         int day = (int) (Math.round(g - i) - Math.floor(30.6001 * k));
         double month = k - 1 - 12 * Math.floor(k / 14);
-        int hour = (int) (Math.floor(l));
-        double minutef = (Math.abs(l) - Math.floor(Math.abs(l))) * 60.0;
-        int minute = (int) Math.round(minutef);
-        int second = (int) Math.round((minutef - Math.floor(minutef)) * 60.0);
-        if (minute == 60.0d) {
-            minute = 0;
-            hour += 1.0d;
-        }
+        int millisInDay = (int) Math.round(l * 60 * 60 * 1000);
 
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.MONTH, (int) month - 1);
         calendar.set(Calendar.DAY_OF_MONTH, day);
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, second);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
+        calendar.add(Calendar.MILLISECOND, millisInDay);
         return calendar.getTime();
     }
 
