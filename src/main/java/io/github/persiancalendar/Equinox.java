@@ -14,7 +14,7 @@ import java.util.TimeZone;
 
 public class Equinox {
     // One degree expressed in radians
-    private final static double degrees = Math.PI / 180.0;
+    private final static double degrees = Math.PI / 180d;
 
     //// Vårjevndogn / Vernal equinox / March equinox
     //func Equinox(year int) time.Time {
@@ -57,16 +57,17 @@ public class Equinox {
     // Calculate vårjevndøgn, sommersolverv, høstjevndøgn or vintersolverv
     private static Date calculateEquinoxOrSolstice(int year, double a) {
         // TODO: Simplify with a symbolic calculator
-        double b = (a - 2451545.0) / 36525.0;
+        double b = (a - 2451545) / 36525d;
         double c = (35999.373 * b - 2.47) * degrees;
-        double d = a + (0.00001 * tableFormula(b)) / (1.0 + 0.0334 * Math.cos(c) + 0.0007 * Math.cos(2 * c)) - (66.0 + ((double) (year - 2000)) * 1.0) / 86400.0;
+        double d = a + (.00001 * tableFormula(b)) / (1 + 0.0334 * Math.cos(c) + 0.0007 * Math.cos(2 * c))
+                - (66 + year - 2000) / 86400d;
         double e = Math.round(d);
         double f = Math.floor((e - 1867216.25) / 36524.25);
-        double g = e + f - Math.floor(f / 4) + 1525.0;
+        double g = e + f - Math.floor(f / 4) + 1525d;
         double h = Math.floor((g - 122.1) / 365.25);
-        double i = 365.0 * h + Math.floor(h / 4);
+        double i = 365 * h + Math.floor(h / 4);
         double k = Math.floor((g - i) / 30.6001);
-        double l = 24.0 * (d + 0.5 - e);
+        double l = 24 * (d + .5 - e);
         int day = (int) (Math.round(g - i) - Math.floor(30.6001 * k));
         double month = k - 1 - 12 * Math.floor(k / 14);
         int millisInDay = (int) Math.round(l * 60 * 60 * 1000);
@@ -85,29 +86,29 @@ public class Equinox {
 
     // Spring equinox for the northern hemisphere
     public static Date northwardEquinox(int year) {
-        double y = ((double) (year) - 2000.0) / 1000.0;
-        double a = 2451623.80984 + 365242.37404 * y + 0.05169 * y * y - 0.00411 * y * y * y - 0.00057 * y * y * y * y;
+        double y = (year - 2000) / 1000d;
+        double a = 2451623.80984 + 365242.37404 * y + .05169 * y * y - .00411 * y * y * y - .00057 * y * y * y * y;
         return calculateEquinoxOrSolstice(year, a);
     }
 
     // Summer solstice for the northern hemisphere
     public static Date northernSolstice(int year) {
-        double y = ((double) (year) - 2000.0) / 1000.0;
-        double a = 2451716.56767 + 365241.62603 * y + 0.00325 * y * y + 0.00888 * y * y * y - 0.00030 * y * y * y * y;
+        double y = (year - 2000) / 1000d;
+        double a = 2451716.56767 + 365241.62603 * y + .00325 * y * y + .00888 * y * y * y - .00030 * y * y * y * y;
         return calculateEquinoxOrSolstice(year, a);
     }
 
     // Autumn equinox for the northern hemisphere
     public static Date southwardEquinox(int year) {
-        double y = ((double) (year) - 2000.0) / 1000.0;
-        double a = 2451810.21715 + 365242.01767 * y - 0.11575 * y * y + 0.00337 * y * y * y + 0.00078 * y * y * y * y;
+        double y = (year - 2000) / 1000d;
+        double a = 2451810.21715 + 365242.01767 * y - .11575 * y * y + .00337 * y * y * y + .00078 * y * y * y * y;
         return calculateEquinoxOrSolstice(year, a);
     }
 
     // Winter solstice for the northern hemisphere
     public static Date southernSolstice(int year) {
-        double y = ((double) (year) - 2000.0) / 1000.0;
-        double a = 2451900.05952 + 365242.74049 * y - 0.06223 * y * y - 0.00823 * y * y * y + 0.00032 * y * y * y * y;
+        double y = (year - 2000) / 1000d;
+        double a = 2451900.05952 + 365242.74049 * y - .06223 * y * y - .00823 * y * y * y + .00032 * y * y * y * y;
         return calculateEquinoxOrSolstice(year, a);
     }
 }
