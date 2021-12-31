@@ -14,7 +14,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 }
 
-configure<JavaPluginConvention> {
+configure<JavaPluginExtension> {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
