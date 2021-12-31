@@ -74,6 +74,6 @@ public class MainTests {
         assertEquals(1584676183400L, Equinox.NORTHWARD_EQUINOX.inYear(2020).getTime());
         assertEquals(1592689390621L, Equinox.NORTHERN_SOLSTICE.inYear(2020).getTime());
         assertEquals(1600781435095L, Equinox.SOUTHWARD_EQUINOX.inYear(2020).getTime());
-        assertEquals(1608544954756L, Equinox.SOUTHERN_SOLSTICE.inYear(2020).getTime());
+        assertEquals(1608544954755L, Equinox.SOUTHERN_SOLSTICE.inYear(2020).getTime());
     }
 }

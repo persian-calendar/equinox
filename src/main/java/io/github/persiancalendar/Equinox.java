@@ -9,8 +9,8 @@ package io.github.persiancalendar;
 ////// 6.5.2012
 // Its API is improved by ideas from https://github.com/MenoData/Time4J/blob/78cd60d6/base/src/main/java/net/time4j/calendar/astro/AstronomicalSeason.java
 
-import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public enum Equinox {
@@ -31,81 +31,83 @@ public enum Equinox {
      */
     SOUTHERN_SOLSTICE;
 
-    // One degree expressed in radians
-    private final static double degrees = Math.PI / 180d;
+    // Meeus - Astronomical Algorithms - p179, Table 27.C
+    private final static double[][] equinoxTerms = {
+            {485, 324.96, 1934.136},
+            {203, 337.23, 32964.467},
+            {199, 342.08, 20.186},
+            {182, 27.85, 445267.112},
+            {156, 73.14, 45036.886},
+            {136, 171.52, 22518.443},
+            {77, 222.54, 65928.934},
+            {74, 296.72, 3034.906},
+            {70, 243.58, 9037.513},
+            {58, 119.81, 33718.147},
+            {52, 297.17, 150.678},
+            {50, 21.02, 2281.226},
+            {45, 247.54, 29929.562},
+            {44, 325.15, 31555.956},
+            {29, 60.93, 4443.417},
+            {18, 155.12, 67555.328},
+            {17, 288.79, 4562.452},
+            {16, 198.04, 62894.029},
+            {14, 199.76, 31436.921},
+            {12, 95.39, 14577.848},
+            {12, 287.11, 31931.756},
+            {12, 320.81, 34777.259},
+            {9, 227.73, 1222.114},
+            {8, 15.45, 16859.074}
+    };
 
-    private static double tableFormula(double x) {
+    private static double periodic24(double x) {
         double result = 0;
-        // TODO: Replace with a table and a loop
-        result += 485 * Math.cos(degrees * (324.96 + x * 1934.136));
-        result += 203 * Math.cos(degrees * (337.23 + x * 32964.467));
-        result += 199 * Math.cos(degrees * (342.08 + x * 20.186));
-        result += 182 * Math.cos(degrees * (27.85 + x * 445267.112));
-        result += 156 * Math.cos(degrees * (73.14 + x * 45036.886));
-        result += 136 * Math.cos(degrees * (171.52 + x * 22518.443));
-        result += 77 * Math.cos(degrees * (222.54 + x * 65928.934));
-        result += 74 * Math.cos(degrees * (296.72 + x * 3034.906));
-        result += 70 * Math.cos(degrees * (243.58 + x * 9037.513));
-        result += 58 * Math.cos(degrees * (119.81 + x * 33718.147));
-        result += 52 * Math.cos(degrees * (297.17 + x * 150.678));
-        result += 50 * Math.cos(degrees * (21.02 + x * 2281.226));
-        result += 45 * Math.cos(degrees * (247.54 + x * 29929.562));
-        result += 44 * Math.cos(degrees * (325.15 + x * 31555.956));
-        result += 29 * Math.cos(degrees * (60.93 + x * 4443.417));
-        result += 18 * Math.cos(degrees * (155.12 + x * 67555.328));
-        result += 17 * Math.cos(degrees * (288.79 + x * 4562.452));
-        result += 16 * Math.cos(degrees * (198.04 + x * 62894.029));
-        result += 14 * Math.cos(degrees * (199.76 + x * 31436.921));
-        result += 12 * Math.cos(degrees * (95.39 + x * 14577.848));
-        result += 12 * Math.cos(degrees * (287.11 + x * 31931.756));
-        result += 12 * Math.cos(degrees * (320.81 + x * 34777.259));
-        result += 9 * Math.cos(degrees * (227.73 + x * 1222.114));
-        result += 8 * Math.cos(degrees * (15.45 + x * 16859.074));
+        for (double[] term : equinoxTerms)
+            result += term[0] * Math.cos(Math.PI / 180d * (term[1] + x * term[2]));
         return result;
     }
 
-    public Date inYear(int year) {
-        double y = (year - 2000) / 1000d;
-        double a = 0;
+    private double jdMean(int year) {
+        // Meeus - Astronomical Algorithms - p178, Table 27.B
+        final double y = (year - 2000) / 1000.0;
         switch (this) {
             case NORTHWARD_EQUINOX:
-                a = 2451623.80984 + 365242.37404 * y + .05169 * y * y - .00411 * y * y * y - .00057 * y * y * y * y;
-                break;
+                return 2451623.80984 + (365242.37404 + (.05169 + (-.00411 - .00057 * y) * y) * y) * y;
             case NORTHERN_SOLSTICE:
-                a = 2451716.56767 + 365241.62603 * y + .00325 * y * y + .00888 * y * y * y - .00030 * y * y * y * y;
-                break;
+                return 2451716.56767 + (365241.62603 + (.00325 + (.00888 - .00030 * y) * y) * y) * y;
             case SOUTHWARD_EQUINOX:
-                a = 2451810.21715 + 365242.01767 * y - .11575 * y * y + .00337 * y * y * y + .00078 * y * y * y * y;
-                break;
+                return 2451810.21715 + (365242.01767 + (-.11575 + (.00337 + .00078 * y) * y) * y) * y;
+            default:
             case SOUTHERN_SOLSTICE:
-                a = 2451900.05952 + 365242.74049 * y - .06223 * y * y - .00823 * y * y * y + .00032 * y * y * y * y;
-                break;
+                return 2451900.05952 + (365242.74049 + (-.06223 + (-.00823 + .00032 * y) * y) * y) * y;
         }
+    }
 
-        double b = (a - 2451545) / 36525d;
-        double c = (35999.373 * b - 2.47) * degrees;
-        double d = a + (.00001 * tableFormula(b)) / (1 + 0.0334 * Math.cos(c) + 0.0007 * Math.cos(2 * c))
+    public Date inYear(int year) {
+        final double a = jdMean(year);
+        final double b = (a - 2451545) / 36525d;
+        final double c = (35999.373 * b - 2.47) * Math.PI / 180d;
+        final double d = a + (.00001 * periodic24(b)) / (1 + 0.0334 * Math.cos(c) + 0.0007 * Math.cos(2 * c))
                 - (66 + year - 2000) / 86400d;
-        double e = Math.round(d);
-        double f = Math.floor((e - 1867216.25) / 36524.25);
-        double g = e + f - Math.floor(f / 4) + 1525d;
-        double h = Math.floor((g - 122.1) / 365.25);
-        double i = 365 * h + Math.floor(h / 4);
-        double k = Math.floor((g - i) / 30.6001);
-        double l = 24 * (d + .5 - e);
-        int day = (int) (Math.round(g - i) - Math.floor(30.6001 * k));
-        double month = k - 1 - 12 * Math.floor(k / 14);
-        int millisInDay = (int) Math.round(l * 60 * 60 * 1000);
+        final double e = Math.round(d);
+        final double f = Math.floor((e - 1867216.25) / 36524.25);
+        final double g = e + f - Math.floor(f / 4) + 1525d;
+        final double h = Math.floor((g - 122.1) / 365.25);
+        final double i = 365 * h + Math.floor(h / 4);
+        final double k = Math.floor((g - i) / 30.6001);
+        final double l = 24 * (d + .5 - e);
+        final int day = (int) (Math.round(g - i) - Math.floor(30.6001 * k));
+        final double month = k - 1 - 12 * Math.floor(k / 14);
+        final int millisInDay = (int) Math.round(l * 60 * 60 * 1000);
 
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, (int) month - 1);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        calendar.add(Calendar.MILLISECOND, millisInDay);
+        final GregorianCalendar calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        calendar.set(GregorianCalendar.YEAR, year);
+        calendar.set(GregorianCalendar.MONTH, (int) month - 1);
+        calendar.set(GregorianCalendar.DAY_OF_MONTH, day);
+        calendar.set(GregorianCalendar.HOUR_OF_DAY, 0);
+        calendar.set(GregorianCalendar.MINUTE, 0);
+        calendar.set(GregorianCalendar.SECOND, 0);
+        calendar.set(GregorianCalendar.MILLISECOND, 0);
+        calendar.add(GregorianCalendar.MILLISECOND, millisInDay);
         return calendar.getTime();
     }
 }
