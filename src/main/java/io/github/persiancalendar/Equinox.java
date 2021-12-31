@@ -7,22 +7,32 @@ package io.github.persiancalendar;
 ////// algorithm from Meeus
 ////// adapted by Juergen Giesen
 ////// 6.5.2012
+// Its API is improved by ideas from https://github.com/MenoData/Time4J/blob/78cd60d6/base/src/main/java/net/time4j/calendar/astro/AstronomicalSeason.java
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class Equinox {
+public enum Equinox {
+    /**
+     * Spring equinox for the northern hemisphere in March (or Fall on the southern hemisphere).
+     */
+    NORTHWARD_EQUINOX,
+    /**
+     * Summer solstice for the northern hemisphere in June (or Winter on the southern hemisphere).
+     */
+    NORTHERN_SOLSTICE,
+    /**
+     * Fall equinox for the northern hemisphere in September (or Spring on the southern hemisphere).
+     */
+    SOUTHWARD_EQUINOX,
+    /**
+     * Winter solstice for the northern hemisphere in December (or Summer on the southern hemisphere).
+     */
+    SOUTHERN_SOLSTICE;
+
     // One degree expressed in radians
     private final static double degrees = Math.PI / 180d;
-
-    //// Vårjevndogn / Vernal equinox / March equinox
-    //func Equinox(year int) time.Time {
-    //	// Source: http://www.phpro.org/examples/Get-Vernal-Equinox.html
-    //	days_from_base := 79.3125 + float64(year - 1970) * 365.2425
-    //	seconds_from_base := days_from_base * 86400.0
-    //	return time.Unix(round(seconds_from_base), 0)
-    //}
 
     private static double tableFormula(double x) {
         double result = 0;
@@ -54,9 +64,24 @@ public class Equinox {
         return result;
     }
 
-    // Calculate vårjevndøgn, sommersolverv, høstjevndøgn or vintersolverv
-    private static Date calculateEquinoxOrSolstice(int year, double a) {
-        // TODO: Simplify with a symbolic calculator
+    public Date inYear(int year) {
+        double y = (year - 2000) / 1000d;
+        double a = 0;
+        switch (this) {
+            case NORTHWARD_EQUINOX:
+                a = 2451623.80984 + 365242.37404 * y + .05169 * y * y - .00411 * y * y * y - .00057 * y * y * y * y;
+                break;
+            case NORTHERN_SOLSTICE:
+                a = 2451716.56767 + 365241.62603 * y + .00325 * y * y + .00888 * y * y * y - .00030 * y * y * y * y;
+                break;
+            case SOUTHWARD_EQUINOX:
+                a = 2451810.21715 + 365242.01767 * y - .11575 * y * y + .00337 * y * y * y + .00078 * y * y * y * y;
+                break;
+            case SOUTHERN_SOLSTICE:
+                a = 2451900.05952 + 365242.74049 * y - .06223 * y * y - .00823 * y * y * y + .00032 * y * y * y * y;
+                break;
+        }
+
         double b = (a - 2451545) / 36525d;
         double c = (35999.373 * b - 2.47) * degrees;
         double d = a + (.00001 * tableFormula(b)) / (1 + 0.0334 * Math.cos(c) + 0.0007 * Math.cos(2 * c))
@@ -82,33 +107,5 @@ public class Equinox {
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.add(Calendar.MILLISECOND, millisInDay);
         return calendar.getTime();
-    }
-
-    // Spring equinox for the northern hemisphere
-    public static Date northwardEquinox(int year) {
-        double y = (year - 2000) / 1000d;
-        double a = 2451623.80984 + 365242.37404 * y + .05169 * y * y - .00411 * y * y * y - .00057 * y * y * y * y;
-        return calculateEquinoxOrSolstice(year, a);
-    }
-
-    // Summer solstice for the northern hemisphere
-    public static Date northernSolstice(int year) {
-        double y = (year - 2000) / 1000d;
-        double a = 2451716.56767 + 365241.62603 * y + .00325 * y * y + .00888 * y * y * y - .00030 * y * y * y * y;
-        return calculateEquinoxOrSolstice(year, a);
-    }
-
-    // Autumn equinox for the northern hemisphere
-    public static Date southwardEquinox(int year) {
-        double y = (year - 2000) / 1000d;
-        double a = 2451810.21715 + 365242.01767 * y - .11575 * y * y + .00337 * y * y * y + .00078 * y * y * y * y;
-        return calculateEquinoxOrSolstice(year, a);
-    }
-
-    // Winter solstice for the northern hemisphere
-    public static Date southernSolstice(int year) {
-        double y = (year - 2000) / 1000d;
-        double a = 2451900.05952 + 365242.74049 * y - .06223 * y * y - .00823 * y * y * y + .00032 * y * y * y * y;
-        return calculateEquinoxOrSolstice(year, a);
     }
 }

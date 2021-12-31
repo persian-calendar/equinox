@@ -57,7 +57,7 @@ public class MainTests {
         };
 
         for (int[] item : elements) {
-            calendar.setTime(Equinox.northwardEquinox(item[0]));
+            calendar.setTime(Equinox.NORTHWARD_EQUINOX.inYear(item[0]));
             assertEquals(String.valueOf(item[0]), item[0], calendar.get(Calendar.YEAR));
             assertEquals(String.valueOf(item[0]), item[1], calendar.get(Calendar.MONTH) + 1);
             assertEquals(String.valueOf(item[0]), item[2], calendar.get(Calendar.DAY_OF_MONTH));
@@ -68,12 +68,12 @@ public class MainTests {
 
         // And not having random crashes
         for (int i = -2000; i <= 10000; i++) {
-            Equinox.northwardEquinox(i);
+            Equinox.NORTHWARD_EQUINOX.inYear(i);
         }
 
-        assertEquals(1584676183400L, Equinox.northwardEquinox(2020).getTime());
-        assertEquals(1592689390621L, Equinox.northernSolstice(2020).getTime());
-        assertEquals(1600781435095L, Equinox.southwardEquinox(2020).getTime());
-        assertEquals(1608544954756L, Equinox.southernSolstice(2020).getTime());
+        assertEquals(1584676183400L, Equinox.NORTHWARD_EQUINOX.inYear(2020).getTime());
+        assertEquals(1592689390621L, Equinox.NORTHERN_SOLSTICE.inYear(2020).getTime());
+        assertEquals(1600781435095L, Equinox.SOUTHWARD_EQUINOX.inYear(2020).getTime());
+        assertEquals(1608544954756L, Equinox.SOUTHERN_SOLSTICE.inYear(2020).getTime());
     }
 }
