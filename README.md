@@ -41,7 +41,7 @@ allprojects {
 Add the dependency
 ```kotlin
 dependencies {
-    implementation("com.github.persian-calendar:equinox:1.0.2")
+    implementation("com.github.persian-calendar:equinox:2.0.0")
 }
 ```
  
