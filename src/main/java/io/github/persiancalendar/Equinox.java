@@ -86,7 +86,7 @@ public enum Equinox {
         final double a = jdMean(year);
         final double b = (a - 2451545) / 36525d;
         final double c = (35999.373 * b - 2.47) * Math.PI / 180d;
-        final double d = a + (.00001 * periodic24(b)) / (1 + 0.0334 * Math.cos(c) + 0.0007 * Math.cos(2 * c))
+        final double d = a + (.00001 * periodic24(b)) / (1 + .0334 * Math.cos(c) + .0007 * Math.cos(2 * c))
                 - (66 + year - 2000) / 86400d;
         final double e = Math.round(d);
         final double f = Math.floor((e - 1867216.25) / 36524.25);
