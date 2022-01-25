@@ -62,7 +62,7 @@ public enum Equinox {
     private static double periodic24(double x) {
         double result = 0;
         for (double[] term : equinoxTerms)
-            result += term[0] * Math.cos(Math.PI / 180d * (term[1] + x * term[2]));
+            result += term[0] * Math.cos(Math.toRadians(term[1] + x * term[2]));
         return result;
     }
 
@@ -85,7 +85,7 @@ public enum Equinox {
     public Date inYear(int year) {
         final double a = jdMean(year);
         final double b = (a - 2451545) / 36525d;
-        final double c = (35999.373 * b - 2.47) * Math.PI / 180d;
+        final double c = Math.toRadians(35999.373 * b - 2.47);
         final double d = a + (.00001 * periodic24(b)) / (1 + .0334 * Math.cos(c) + .0007 * Math.cos(2 * c))
                 - (66 + year - 2000) / 86400d;
         final double e = Math.round(d);
