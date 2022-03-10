@@ -1,11 +1,11 @@
 package io.github.persiancalendar;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MainTests {
     @Test
@@ -58,12 +58,13 @@ public class MainTests {
 
         for (int[] item : elements) {
             calendar.setTime(Equinox.NORTHWARD_EQUINOX.inYear(item[0]));
-            assertEquals(String.valueOf(item[0]), item[0], calendar.get(Calendar.YEAR));
-            assertEquals(String.valueOf(item[0]), item[1], calendar.get(Calendar.MONTH) + 1);
-            assertEquals(String.valueOf(item[0]), item[2], calendar.get(Calendar.DAY_OF_MONTH));
-            assertEquals(String.valueOf(item[0]), item[3], calendar.get(Calendar.HOUR_OF_DAY));
-            assertEquals(String.valueOf(item[0]), item[4], calendar.get(Calendar.MINUTE));
-            assertEquals(String.valueOf(item[0]), item[5], calendar.get(Calendar.SECOND));
+            String year = String.valueOf(item[0]);
+            assertEquals(item[0], calendar.get(Calendar.YEAR), year);
+            assertEquals(item[1], calendar.get(Calendar.MONTH) + 1, year);
+            assertEquals(item[2], calendar.get(Calendar.DAY_OF_MONTH), year);
+            assertEquals(item[3], calendar.get(Calendar.HOUR_OF_DAY), year);
+            assertEquals(item[4], calendar.get(Calendar.MINUTE), year);
+            assertEquals(item[5], calendar.get(Calendar.SECOND), year);
         }
 
         // And not having random crashes
