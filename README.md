@@ -28,8 +28,8 @@ SOFTWARE.
 ```
 
 # Usage
-### Gradle
-Add it in your root build.gradle at the end of repositories:
+
+Add this in your root `build.gradle.kts` at the end of repositories section:
 ```kotlin
 allprojects {
     repositories {
@@ -37,12 +37,13 @@ allprojects {
         maven("https://jitpack.io")
     }
 }
-```  
-Add the dependency
+```
+
+Now actually add the dependency:
 ```kotlin
 dependencies {
     implementation("com.github.persian-calendar:equinox:2.0.0")
 }
 ```
  
-for other build tools refer to [this](https://jitpack.io/#persian-calendar/calendar) documentation.
+for other build tools support have a look at [this](https://jitpack.io/#persian-calendar/equinox).
