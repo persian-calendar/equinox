@@ -1,4 +1,7 @@
 # Equinox
+
+DEPRECATED: We now use https://github.com/cosinekitty/astronomy in the app which is a little slower but more accurate.
+
 [![](https://jitpack.io/v/persian-calendar/calendar.svg)](https://jitpack.io/#persian-calendar/equinox)
 
 Ported from Calendar package for Go https://github.com/xyproto/calendar/blob/master/equinox.go
