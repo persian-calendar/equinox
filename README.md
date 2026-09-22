@@ -68,10 +68,24 @@ Each native test task only runs on its matching host; the CI matrix in
 `.github/workflows/main.yml` runs them on the appropriate runners.
 
 The equinox algorithm and the DE440 reference data are generated from the
-scripts in `python/`:
+scripts in `python/`. The test data additionally depends on the
+[`equinox-research`](https://github.com/persian-calendar/equinox-research)
+submodule (official Iranian ground-truth equinox moments), so clone with
+`--recursive`:
 
 ```sh
+git clone --recursive https://github.com/persian-calendar/equinox.git
+# or, in an existing clone:
+git submodule update --init --recursive
+
 ./gradlew generateSources
+```
+
+To verify the committed generated sources are in sync with the generators (this
+is also run by CI):
+
+```sh
+./gradlew checkGeneratedSources
 ```
 
 ## License

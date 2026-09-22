@@ -1,0 +1,2 @@
+skyfield>=1.48
+numpy>=1.26

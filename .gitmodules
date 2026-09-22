@@ -1,0 +1,3 @@
+[submodule "python/equinox-research"]
+	path = python/equinox-research
+	url = https://github.com/persian-calendar/equinox-research.git

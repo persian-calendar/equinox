@@ -1,7 +1,7 @@
 # Python tooling
 
-These scripts regenerate the two generated Kotlin artifacts in this project.
-They need Python 3.9+, [`skyfield`](https://rhodesmill.org/skyfield/) and a JPL
+These scripts regenerate the generated Kotlin artifacts in this project. They
+need Python 3.9+, [`skyfield`](https://rhodesmill.org/skyfield/) and a JPL
 DE440 ephemeris (`de440.bsp`), which skyfield downloads to `~/.skyfield` on
 demand or which can be pointed at with `--bsp`.
 
@@ -11,6 +11,13 @@ Run them together through Gradle, or individually:
 ./gradlew generateSources        # runs both scripts below
 python3 python/generate_equinox.py
 python3 python/generate_tests.py
+```
+
+`generate_tests.py` also reads the `python/equinox-research` git submodule, so
+initialize it first:
+
+```sh
+git submodule update --init --recursive
 ```
 
 ## `generate_equinox.py`
@@ -42,8 +49,25 @@ Accuracy vs DE440 (all four seasons):
 
 ## `generate_tests.py`
 
-Regenerates `src/commonTest/kotlin/io/github/persiancalendar/De440Reference.kt`:
-the JPL DE440 season instants consumed by the `commonTest` suite. It emits three
-Kotlin data structures — the full 1800–2200 table plus two spot-check lists —
-so the tests need no classpath resources and run on every Kotlin Multiplatform
-target.
+Regenerates two test data sources:
+
+1. `src/commonTest/kotlin/io/github/persiancalendar/De440Reference.kt` — the
+   JPL DE440 season instants consumed by the `commonTest` suite. It emits three
+   Kotlin data structures (the full 1800–2200 table plus two spot-check lists),
+   so the tests need no classpath resources and run on every Kotlin
+   Multiplatform target.
+
+2. The `IRAN_GROUND_TRUTH` block in
+   `src/commonTest/kotlin/io/github/persiancalendar/Tests.kt` — the official
+   Tehran University announced spring-equinox (Nowruz) moments,
+   read from `python/equinox-research/iran-ground-truth.json`. These are **not**
+   derived from DE440, so the script compares them against DE440 and emits a
+   per-year tolerance (seconds). The per-year comparison table is printed to
+   stdout, e.g.:
+
+   ```
+    year  ground_truth_ms        de440_ms   delta_s  tolerance_s
+    2026    1774017959000   1774017957447       1.6            5
+    ...
+    2002    1016651762000   1016651768344      -6.3           10
+   ```

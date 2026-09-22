@@ -50,8 +50,15 @@ val generateTests = tasks.register<Exec>("generateTests") {
 
 tasks.register("generateSources") {
     group = "generation"
-    description = "Regenerate all generated files (Equinox.kt, De440Reference.kt)"
+    description = "Regenerate all generated files (Equinox.kt, De440Reference.kt, Tests.kt)"
     dependsOn(generateEquinox, generateTests)
+}
+
+val checkGeneratedSources = tasks.register<Exec>("checkGeneratedSources") {
+    group = "verification"
+    description = "Regenerate all sources and fail if they differ from what is committed"
+    dependsOn("generateSources")
+    commandLine("git", "diff", "--exit-code", "--", "src/")
 }
 
 val sourceJar = tasks.register<Jar>("sourceJar") {

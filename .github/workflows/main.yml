@@ -29,3 +29,34 @@ jobs:
       - name: Test with Gradle
         shell: bash
         run: ./gradlew ${{ matrix.gradle-tasks }}
+
+  check-generated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: 'true'
+      - uses: actions/setup-java@v6
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Python dependencies
+        run: pip install -r python/requirements.txt
+      - name: Cache skyfield data
+        uses: actions/cache@v4
+        with:
+          path: ~/.skyfield
+          key: skyfield-data-v1
+      - name: Download ephemeris data (if not cached)
+        run: |
+          mkdir -p ~/.skyfield
+          test -f ~/.skyfield/de440.bsp || \
+            curl -fsSL https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440.bsp -o ~/.skyfield/de440.bsp || \
+            curl -fsSL https://ssd.jpl.nasa.gov/ftp/eph/planets/bsp/de440.bsp -o ~/.skyfield/de440.bsp
+          test -f ~/.skyfield/VSOP87D.ear || \
+            curl -fsSL ftp://ftp.imcce.fr/pub/ephem/planets/vsop87/VSOP87D.ear -o ~/.skyfield/VSOP87D.ear
+      - name: Verify generated sources are up to date
+        run: ./gradlew checkGeneratedSources
