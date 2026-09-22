@@ -107,7 +107,12 @@ class Tests {
 
     @Test
     fun doesNotThrowAcrossExtendedRange() {
-        (-2000..10000).forEach { Equinox.NORTHWARD_EQUINOX of it }
+        (-2000..10000).forEach {
+            Equinox.NORTHWARD_EQUINOX of it
+            Equinox.NORTHERN_SOLSTICE of it
+            Equinox.SOUTHWARD_EQUINOX of it
+            Equinox.SOUTHERN_SOLSTICE of it
+        }
     }
 
     @Test
