@@ -97,7 +97,7 @@ class Tests {
             val actual = Equinox.NORTHWARD_EQUINOX of year
             val delta = abs(actual - expectedMillis)
             println(
-                "IranNowruz $year: off by ${delta}ms " +
+                "Nowruz declared by Tehran University for $year A.D.: off by ${delta}ms " +
                     "(tolerance=${toleranceSeconds}s; expected $expectedMillis, got $actual)"
             )
             assertTrue(
