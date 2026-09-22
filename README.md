@@ -1,52 +1,79 @@
 # Equinox
 
-DEPRECATED: We now use https://github.com/cosinekitty/astronomy in the app which is a little slower but more accurate.
+[![](https://jitpack.io/v/persian-calendar/equinox.svg)](https://jitpack.io/#persian-calendar/equinox)
 
-[![](https://jitpack.io/v/persian-calendar/calendar.svg)](https://jitpack.io/#persian-calendar/equinox)
+A dependency-free [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html)
+library that computes equinoxes and solstices to **sub-second accuracy** against
+the JPL DE440 ephemeris (1800–2200), for the JVM, JavaScript, and native
+(Linux, macOS, Windows) targets.
 
-Ported from Calendar package for Go https://github.com/xyproto/calendar/blob/master/equinox.go
+The Sun's apparent geocentric ecliptic longitude is computed from the VSOP87
+Earth theory, IAU 2000B nutation and annual aberration; the instant it reaches
+0°/90°/180°/270° is located with Newton's method and converted to Unix/POSIX
+epoch milliseconds using the TAI−UTC leap-second table.
 
-```
-The MIT License (MIT)
+## Usage
 
-Copyright (c) 2017 Alexander F Rødseth
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-# Usage
-
-Add this in your root `build.gradle.kts` at the end of repositories section:
 ```kotlin
-allprojects {
+import io.github.persiancalendar.Equinox
+
+val marchEquinox = Equinox.NORTHWARD_EQUINOX of 2026 // Long, epoch millis (UTC)
+val juneSolstice = Equinox.NORTHERN_SOLSTICE of 2026
+val septEquinox  = Equinox.SOUTHWARD_EQUINOX of 2026
+val decSolstice  = Equinox.SOUTHERN_SOLSTICE of 2026
+```
+
+`of` returns the season instant as Unix/POSIX epoch milliseconds.
+
+### Dependency
+
+```kotlin
+// settings.gradle.kts
+dependencyResolutionManagement {
     repositories {
-        ...
+        // ...
         maven("https://jitpack.io")
     }
 }
-```
 
-Now actually add the dependency:
-```kotlin
+// build.gradle.kts
 dependencies {
-    implementation("com.github.persian-calendar:equinox:2.0.0")
+    implementation("com.github.persian-calendar:equinox:x.y.z")
 }
 ```
- 
-for other build tools support have a look at [this](https://jitpack.io/#persian-calendar/equinox).
+
+For other build tools, see [jitpack.io](https://jitpack.io/#persian-calendar/equinox).
+
+## Accuracy
+
+Validated against JPL DE440 (all four seasons):
+
+| range     | std     | max |
+|-----------|---------|-----|
+| 1800–2200 | 0.29 s  | 0.93 s |
+| 1900–2100 | 0.23 s  | 0.70 s |
+| 2002–2022 | 0.22 s  | 0.66 s |
+
+## Building and testing
+
+```sh
+./gradlew jvmTest         # JVM
+./gradlew jsNodeTest      # JavaScript (Node)
+./gradlew linuxX64Test    # Linux native
+./gradlew macosArm64Test  # macOS native (Apple Silicon)
+./gradlew mingwX64Test    # Windows native
+```
+
+Each native test task only runs on its matching host; the CI matrix in
+`.github/workflows/main.yml` runs them on the appropriate runners.
+
+The equinox algorithm and the DE440 reference data are generated from the
+scripts in `python/`:
+
+```sh
+./gradlew generateSources
+```
+
+## License
+
+MIT

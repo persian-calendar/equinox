@@ -3,4 +3,5 @@
 /build/
 local.properties
 /bin
+.kotlin
 .DS_Store

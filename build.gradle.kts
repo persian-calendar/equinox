@@ -1,44 +1,70 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    java
+    kotlin("multiplatform") version "2.4.20"
     `maven-publish`
 }
 
 group = "io.github.persiancalendar"
-version = "2.0.0"
+version = "3.0.0"
 
 repositories {
     mavenCentral()
 }
 
-dependencies {
-    testImplementation(libs.junit.jupiter.api)
-    testImplementation(libs.junit.jupiter.params)
-    testRuntimeOnly(libs.junit.jupiter.engine)
-    testRuntimeOnly(libs.junit.platform.launcher)
+kotlin {
+    jvmToolchain(21)
+
+    jvm {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_21
+        }
+    }
+
+    js {
+        nodejs()
+    }
+
+    linuxX64()
+    macosArm64()
+    mingwX64()
+
+    sourceSets {
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
+    }
 }
 
-tasks.test {
-    useJUnitPlatform()
+val generateEquinox = tasks.register<Exec>("generateEquinox") {
+    group = "generation"
+    description = "Regenerate src/commonMain/kotlin/io/github/persiancalendar/Equinox.kt"
+    commandLine("python3", "python/generate_equinox.py")
 }
 
-configure<JavaPluginExtension> {
-    sourceCompatibility = JavaVersion.VERSION_21
+val generateTests = tasks.register<Exec>("generateTests") {
+    group = "generation"
+    description = "Regenerate src/commonTest/kotlin/io/github/persiancalendar/De440Reference.kt"
+    commandLine("python3", "python/generate_tests.py")
+}
+
+tasks.register("generateSources") {
+    group = "generation"
+    description = "Regenerate all generated files (Equinox.kt, De440Reference.kt)"
+    dependsOn(generateEquinox, generateTests)
+}
+
+val sourceJar = tasks.register<Jar>("sourceJar") {
+    archiveClassifier.set("sources")
+    from(kotlin.sourceSets.named("commonMain").map { it.kotlin.srcDirs })
+    from(kotlin.sourceSets.named("jvmMain").map { it.kotlin.srcDirs })
 }
 
 publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/persian-calendar/equinox")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
-            }
-        }
-    }
     publications {
-        register("mavenJava", MavenPublication::class) {
-            from(components["java"])
+        register<MavenPublication>("mavenJava") {
+            from(components["kotlin"])
+            artifact(sourceJar)
         }
     }
 }
