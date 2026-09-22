@@ -5,8 +5,8 @@ plugins {
     `maven-publish`
 }
 
-group = "io.github.persiancalendar"
-version = "3.0.0"
+group = (findProperty("group") as? String) ?: "io.github.persiancalendar"
+version = (findProperty("version") as? String) ?: "3.0.0"
 
 repositories {
     mavenCentral()
@@ -71,19 +71,4 @@ val checkGeneratedSources = tasks.register<Exec>("checkGeneratedSources") {
     description = "Regenerate all sources and fail if they differ from what is committed"
     dependsOn("generateSources")
     commandLine("git", "diff", "--exit-code", "--", "src/")
-}
-
-val sourceJar = tasks.register<Jar>("sourceJar") {
-    archiveClassifier.set("sources")
-    from(kotlin.sourceSets.named("commonMain").map { it.kotlin.srcDirs })
-    from(kotlin.sourceSets.named("jvmMain").map { it.kotlin.srcDirs })
-}
-
-publishing {
-    publications {
-        register<MavenPublication>("mavenJava") {
-            from(components["kotlin"])
-            artifact(sourceJar)
-        }
-    }
 }
