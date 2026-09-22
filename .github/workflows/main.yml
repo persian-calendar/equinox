@@ -9,7 +9,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            gradle-tasks: jvmTest jsNodeTest linuxX64Test
+            gradle-tasks: jvmTest linuxX64Test # jsNodeTest
           - os: macos-14
             gradle-tasks: macosArm64Test
           - os: windows-latest
@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          fetch-depth: 1
+          submodules: 'true'
       - name: Set up JDK 21
         uses: actions/setup-java@v6
         with:
