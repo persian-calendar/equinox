@@ -8,12 +8,33 @@ private const val MAX_ERROR_MILLIS = 1_000L
 
 // === BEGIN GENERATED IRAN GROUND TRUTH (do not edit) ===
 // Regenerate with:  ./gradlew generateSources
-// Official Tehran University announced spring-equinox
+// Official University of Tehran announced spring-equinox
 // (Nowruz) moments, given in IRST (UTC+3:30) and rounded to whole
 // seconds. These are NOT derived from DE440, so each entry carries a
 // per-year tolerance.
 // Entries: Triple(year, epoch_millis_utc, tolerance_seconds).
 internal val IRAN_GROUND_TRUTH: List<Triple<Int, Long, Int>> = listOf(
+    Triple(1981, 353955811000, 44),
+    Triple(1982, 385512959000, 12),
+    Triple(1983, 417069533000, 12),
+    Triple(1984, 448626271000, 15),
+    Triple(1985, 480183236000, 16),
+    Triple(1986, 511740176000, 19),
+    Triple(1987, 543297128000, 14),
+    Triple(1988, 574853936000, 24),
+    Triple(1989, 606410909000, 18),
+    Triple(1990, 637967966000, 14),
+    Triple(1991, 669524524000, 12),
+    Triple(1992, 701081291000, 12),
+    Triple(1993, 732638450000, 16),
+    Triple(1994, 764195293000, 16),
+    Triple(1995, 795752075000, 14),
+    Triple(1996, 827308990000, 10),
+    Triple(1997, 858866086000, 10),
+    Triple(1998, 890423671000, 5),
+    Triple(1999, 921980748000, 5),
+    Triple(2000, 953537714000, 5),
+    Triple(2001, 985095040000, 6),
     Triple(2002, 1016651762000, 10),
     Triple(2003, 1048208385000, 5),
     Triple(2004, 1079765317000, 5),
@@ -95,7 +116,7 @@ class Tests {
             val actual = Equinox.NORTHWARD_EQUINOX of year
             val delta = abs(actual - expectedMillis)
             println(
-                "Nowruz declared by Tehran University for $year A.D.: off by ${delta}ms " +
+                "Nowruz declared by University of Tehran for $year A.D.: off by ${delta}ms " +
                     "(tolerance=${toleranceSeconds}s; expected $expectedMillis, got $actual)"
             )
             assertTrue(

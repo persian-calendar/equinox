@@ -6,7 +6,7 @@ Regenerate the two test data sources under src/commonTest/kotlin/.../:
    (1800-2200), as Kotlin source data consumed by the commonTest suite (no
    classpath resources needed, so the tests run on every KMP target).
 
-2. The IRAN_GROUND_TRUTH block inside Tests.kt — the official Tehran University
+2. The IRAN_GROUND_TRUTH block inside Tests.kt — the official University of Tehran
    announced spring-equinox (Nowruz) moments, read from
    the python/equinox-research git submodule and written between the
    "GENERATED IRAN GROUND TRUTH" markers in Tests.kt. These moments are NOT
@@ -106,7 +106,7 @@ def emit_ground_truth_block(entries):
     return (
         f"{BEGIN_MARKER}\n"
         "// Regenerate with:  ./gradlew generateSources\n"
-        "// Official Tehran University announced spring-equinox\n"
+        "// Official University of Tehran announced spring-equinox\n"
         "// (Nowruz) moments, given in IRST (UTC+3:30) and rounded to whole\n"
         "// seconds. These are NOT derived from DE440, so each entry carries a\n"
         "// per-year tolerance.\n"

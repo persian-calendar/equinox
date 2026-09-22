@@ -59,7 +59,7 @@ Regenerates two test data sources:
 
 2. The `IRAN_GROUND_TRUTH` block in
    `src/commonTest/kotlin/io/github/persiancalendar/Tests.kt` — the official
-   Tehran University announced spring-equinox (Nowruz) moments,
+   University of Tehran announced spring-equinox (Nowruz) moments,
    read from `python/equinox-research/iran-ground-truth.json`. These are **not**
    derived from DE440, so the script compares them against DE440 and emits a
    per-year tolerance (seconds). The per-year comparison table is printed to
