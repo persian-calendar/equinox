@@ -46,7 +46,7 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r python/requirements.txt
       - name: Cache skyfield data
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.skyfield
           key: skyfield-data-v1
