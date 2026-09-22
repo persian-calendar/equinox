@@ -166,9 +166,15 @@ def main():
     T = (my_jd - 2451545.0) / 36525.0
     X = np.column_stack([np.ones_like(T), T, T ** 2])
     coef, *_ = np.linalg.lstsq(X, err, rcond=None)
+    # Round to a fixed precision so the emitted constants are bit-for-bit
+    # identical across platforms: np.linalg.lstsq delegates to LAPACK, whose
+    # SVD differs slightly between OS BLAS implementations (e.g. macOS
+    # Accelerate vs Linux OpenBLAS), which would otherwise shift the fit in
+    # the 7th decimal and break the `checkGeneratedSources` CI gate.
+    coef = np.round(coef, 5)
     resid = err - X @ coef
     print(f"L={nL} R={nR} terms")
-    print(f"correction c0={coef[0]:+.10f} c1={coef[1]:+.10f} c2={coef[2]:+.10f}")
+    print(f"correction c0={coef[0]:+.5f} c1={coef[1]:+.5f} c2={coef[2]:+.5f}")
     for lo, hi in [(1800, 2200), (1900, 2100), (2002, 2022)]:
         mask = (yr >= lo) & (yr <= hi)
         print(f"  {lo}-{hi}: std={resid[mask].std():.3f}s max|err|={np.abs(resid[mask]).max():.3f}s")
@@ -266,9 +272,9 @@ enum class Equinox(
         private const val ASEC2RAD = PI / (180.0 * 3600.0)
         private const val ABERRATION = 20.4898  // solar aberration, arcsec
         private const val MEAN_MOTION = 360.0 / 365.2422  // deg/day
-        private const val CORRECTION_C0 = {coef[0]:+.10f}
-        private const val CORRECTION_C1 = {coef[1]:+.10f}
-        private const val CORRECTION_C2 = {coef[2]:+.10f}
+        private const val CORRECTION_C0 = {coef[0]:+.5f}
+        private const val CORRECTION_C1 = {coef[1]:+.5f}
+        private const val CORRECTION_C2 = {coef[2]:+.5f}
 
         // VSOP87 Earth terms: flat groups of (A, B, C, power); each group
         // contributes A * T^power * cos(B + C*T), where T is in Julian millennia
