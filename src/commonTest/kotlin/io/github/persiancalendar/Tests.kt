@@ -96,6 +96,10 @@ class Tests {
         for ((year, expectedMillis, toleranceSeconds) in IRAN_GROUND_TRUTH) {
             val actual = Equinox.NORTHWARD_EQUINOX of year
             val delta = abs(actual - expectedMillis)
+            println(
+                "IranNowruz $year: off by ${delta}ms " +
+                    "(tolerance=${toleranceSeconds}s; expected $expectedMillis, got $actual)"
+            )
             assertTrue(
                 delta <= toleranceSeconds * 1000L,
                 "year=$year: off by ${delta}ms " +

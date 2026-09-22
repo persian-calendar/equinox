@@ -3,5 +3,6 @@
 /build/
 local.properties
 /bin
+kotlin-js-store/
 .kotlin
 .DS_Store

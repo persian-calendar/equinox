@@ -22,7 +22,13 @@ kotlin {
     }
 
     js {
-        nodejs()
+        nodejs {
+            testTask {
+                useMocha {
+                    timeout = "120s"
+                }
+            }
+        }
     }
 
     linuxX64()
@@ -33,6 +39,12 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
         }
+    }
+}
+
+tasks.withType<org.gradle.api.tasks.testing.AbstractTestTask>().configureEach {
+    testLogging {
+        showStandardStreams = true
     }
 }
 
