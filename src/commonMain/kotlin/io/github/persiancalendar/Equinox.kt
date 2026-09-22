@@ -54,9 +54,9 @@ enum class Equinox(
         private const val ASEC2RAD = PI / (180.0 * 3600.0)
         private const val ABERRATION = 20.4898  // solar aberration, arcsec
         private const val MEAN_MOTION = 360.0 / 365.2422  // deg/day
-        private const val CORRECTION_C0 = -1.8136358753
-        private const val CORRECTION_C1 = -6.7927325451
-        private const val CORRECTION_C2 = -0.2994436486
+        private const val CORRECTION_C0 = -1.81364
+        private const val CORRECTION_C1 = -6.79273
+        private const val CORRECTION_C2 = -0.29944
 
         // VSOP87 Earth terms: flat groups of (A, B, C, power); each group
         // contributes A * T^power * cos(B + C*T), where T is in Julian millennia
