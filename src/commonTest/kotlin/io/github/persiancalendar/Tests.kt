@@ -46,9 +46,9 @@ class Tests {
 
     @Test
     fun allSeasonsMatchDe440WithinOneSecond() {
-        for (row in DE440_REFERENCE) {
+        DE440_REFERENCE.forEach { row ->
             val year = row[0].toInt()
-            for (season in 0..3) {
+            (0..3).forEach { season ->
                 val actual = Equinox.entries[season] of year
                 val expected = row[season + 1]
                 val delta = abs(actual - expected)
@@ -62,7 +62,7 @@ class Tests {
 
     @Test
     fun marchEquinoxSpotCheck() {
-        for ((year, expected) in MARCH_SPOT_CHECK) {
+        MARCH_SPOT_CHECK.forEach { (year, expected) ->
             val actual = Equinox.NORTHWARD_EQUINOX of year
             val delta = abs(actual - expected)
             assertTrue(
@@ -74,7 +74,7 @@ class Tests {
 
     @Test
     fun allSeasonsSpotCheck() {
-        for ((year, season, expected) in ALL_SEASONS_SPOT_CHECK) {
+        ALL_SEASONS_SPOT_CHECK.forEach { (year, season, expected) ->
             val actual = Equinox.entries[season] of year
             val delta = abs(actual - expected)
             assertTrue(
@@ -86,14 +86,12 @@ class Tests {
 
     @Test
     fun doesNotThrowAcrossExtendedRange() {
-        for (year in -2000..10000) {
-            Equinox.NORTHWARD_EQUINOX of year
-        }
+        (-2000..10000).forEach { Equinox.NORTHWARD_EQUINOX of it }
     }
 
     @Test
     fun iranGroundTruthWithinTolerance() {
-        for ((year, expectedMillis, toleranceSeconds) in IRAN_GROUND_TRUTH) {
+        IRAN_GROUND_TRUTH.forEach { (year, expectedMillis, toleranceSeconds) ->
             val actual = Equinox.NORTHWARD_EQUINOX of year
             val delta = abs(actual - expectedMillis)
             println(
