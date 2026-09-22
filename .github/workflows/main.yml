@@ -9,7 +9,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            gradle-tasks: jvmTest jsNodeTest linuxX64Test
+            gradle-tasks: jvmTest jsNodeTest jsBrowserTest linuxX64Test
           - os: macos-14
             gradle-tasks: macosArm64Test
           - os: windows-latest
