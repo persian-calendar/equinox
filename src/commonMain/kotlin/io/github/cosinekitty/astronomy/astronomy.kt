@@ -24,7 +24,6 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 */
-@file:JvmName("Astronomy")
 
 package io.github.cosinekitty.astronomy
 
@@ -545,13 +544,18 @@ class DateTime(
         val wholeMillis: Int = millis.toInt()
 
         val ytext = when {
-            year < 0 -> "-%06d".format(-year)
-            year <= 9999 -> "%04d".format(year)
-            else -> "+%06d".format(year)
+            year < 0 -> "-" + (-year).toString().padStart(6, '0')
+            year <= 9999 -> year.toString().padStart(4, '0')
+            else -> "+" + year.toString().padStart(6, '0')
         }
 
-        return "%s-%02d-%02dT%02d:%02d:%02d.%03dZ"
-            .format(ytext, month, day, hour, minute, wholeSeconds, wholeMillis)
+        return ytext + "-" +
+            month.toString().padStart(2, '0') + "-" +
+            day.toString().padStart(2, '0') + "T" +
+            hour.toString().padStart(2, '0') + ":" +
+            minute.toString().padStart(2, '0') + ":" +
+            wholeSeconds.toString().padStart(2, '0') + "." +
+            wholeMillis.toString().padStart(3, '0') + "Z"
     }
 }
 
@@ -735,7 +739,6 @@ class Time private constructor(
          *
          * @param tt The number of days after the J2000 epoch.
          */
-        @JvmStatic
         fun fromTerrestrialTime(tt: Double) = Time(universalTime(tt), tt)
 
         /**
@@ -746,7 +749,6 @@ class Time private constructor(
          * To facilitate using such values for astronomy calculations, this
          * function converts a millsecond count into a `Time` object.
          */
-        @JvmStatic
         fun fromMillisecondsSince1970(millis: Long) = Time((millis - 946728000000L) / MILLISECONDS_PER_DAY)
     }
 }
@@ -814,7 +816,6 @@ internal data class TerseVector(var x: Double, var y: Double, var z: Double) {
     }
 
     companion object {
-        @JvmStatic
         fun zero() = TerseVector(0.0, 0.0, 0.0)
     }
 }
@@ -1325,7 +1326,6 @@ class RotationMatrix(
          * This matrix can be the starting point for other operations,
          * such as calling a series of [RotationMatrix.combine] or [RotationMatrix.pivot].
          */
-        @JvmStatic
         fun identity() = RotationMatrix(
             1.0, 0.0, 0.0,
             0.0, 1.0, 0.0,
@@ -3634,8 +3634,7 @@ private fun getPlutoSegment(tt: Double): List<BodyGravCalc>? {
         return null     // Don't bother calculating a segment. Let the caller crawl backward/forward to this time
 
     val segIndex = clampIndex((tt - plutoStateTable[0].tt) / PLUTO_TIME_STEP, PLUTO_NUM_STATES-1)
-    return synchronized(plutoCache) {
-        plutoCache.getOrPut(segIndex) {
+    return plutoCache.getOrPut(segIndex) {
             val seg = mutableListOf<BodyGravCalc>()
 
             // The first endpoint is exact.
@@ -3678,7 +3677,6 @@ private fun getPlutoSegment(tt: Double): List<BodyGravCalc>? {
 
             seg
         }
-    }
 }
 
 private fun calcPlutoOneWay(
@@ -6814,7 +6812,6 @@ private fun internalSearchAltitude(
  * within `limitDays` days of `startTime`. This is a normal condition,
  * not an error.
  */
-@JvmOverloads
 fun searchRiseSet(
     body: Body,
     observer: Observer,
