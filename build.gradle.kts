@@ -38,6 +38,11 @@ kotlin {
         }
     }
 
+    wasmJs {
+        nodejs()
+        browser()
+    }
+
     linuxArm64()
     linuxX64()
     macosArm64()
