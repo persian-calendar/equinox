@@ -329,7 +329,7 @@ enum class Equinox(
             var lon = (L + PI) * 180.0 / PI
             lon -= ABERRATION / R / 3600.0
             lon += nutationLongitude(jdTT) * 180.0 / PI
-            return ((lon % 360.0) + 360.0) % 360.0
+            return lon.mod(360.0)
         }}
 
         /**
@@ -347,7 +347,7 @@ enum class Equinox(
             var t = gregorianToJd(year, month, day)
             repeat(10) {{
                 val longitude = apparentLongitude(t)
-                val diff = ((longitude - targetDeg + 180.0) % 360.0 + 360.0) % 360.0 - 180.0
+                val diff = (longitude - targetDeg + 180.0).mod(360.0) - 180.0
                 t -= diff / MEAN_MOTION
             }}
             return t
