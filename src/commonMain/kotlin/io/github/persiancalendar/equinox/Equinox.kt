@@ -1,4 +1,4 @@
-package io.github.persiancalendar
+package io.github.persiancalendar.equinox
 
 // GENERATED FILE — DO NOT EDIT BY HAND.
 // Regenerate with:  ./gradlew generateSources

@@ -1,4 +1,4 @@
-package io.github.persiancalendar
+package io.github.persiancalendar.equinox
 
 import kotlin.math.abs
 import kotlin.test.Test

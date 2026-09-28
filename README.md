@@ -38,7 +38,7 @@ dependencyResolutionManagement {
 
 // build.gradle.kts
 dependencies {
-    implementation("com.github.persian-calendar:equinox:x.y.z")
+    implementation("com.github.persian-calendar:equinox:LATEST_GIT_HASH")
 }
 ```
 

@@ -36,11 +36,11 @@ BSP_CANDIDATES = [
 
 DE440_REF_PATH = os.path.join(
     SCRIPT_DIR, '..',
-    'src/commonTest/kotlin/io/github/persiancalendar/De440Reference.kt')
+    'src/commonTest/kotlin/io/github/persiancalendar/equinox/De440Reference.kt')
 
 TESTS_PATH = os.path.join(
     SCRIPT_DIR, '..',
-    'src/commonTest/kotlin/io/github/persiancalendar/Tests.kt')
+    'src/commonTest/kotlin/io/github/persiancalendar/equinox/Tests.kt')
 
 GROUND_TRUTH_PATH = os.path.join(SCRIPT_DIR, 'equinox-research', 'iran-ground-truth.json')
 
@@ -159,7 +159,7 @@ def main() -> None:
     march = "\n".join(f"    {y} to {m}," for y, m in march_rows)
     seasons = "\n".join(f"    Triple({y}, {s}, {m})," for y, s, m in seasons_rows)
 
-    kotlin = f'''package io.github.persiancalendar
+    kotlin = f'''package io.github.persiancalendar.equinox
 
 // GENERATED FILE — DO NOT EDIT BY HAND.
 // Regenerate with:  ./gradlew generateSources

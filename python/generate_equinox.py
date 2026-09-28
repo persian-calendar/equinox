@@ -24,7 +24,7 @@ R_THRESH = 1e-7
 ABERRATION = 20.4898
 
 OUT_PATH = os.path.join(os.path.dirname(__file__), '..',
-                        'src/commonMain/kotlin/io/github/persiancalendar/Equinox.kt')
+                        'src/commonMain/kotlin/io/github/persiancalendar/equinox/Equinox.kt')
 
 
 def parse_vsop87d(path):
@@ -216,7 +216,7 @@ def main():
     ]
     leap_items = [f"Triple({y}, {m}, {o})" for y, m, o in reversed(leap_rows)]
 
-    kotlin = f'''package io.github.persiancalendar
+    kotlin = f'''package io.github.persiancalendar.equinox
 
 // GENERATED FILE — DO NOT EDIT BY HAND.
 // Regenerate with:  ./gradlew generateSources
