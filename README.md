@@ -19,7 +19,7 @@ import io.github.persiancalendar.equinox.Equinox
 
 val marchEquinox = Equinox.NorthwardEquinox of 2026 // Long, epoch millis (UTC)
 val juneSolstice = Equinox.NorthernSolstice of 2026
-val septEquinox  = Equinox.SouthwardEQUINOX of 2026
+val septEquinox  = Equinox.SouthwardEquinox of 2026
 val decSolstice  = Equinox.SouthernSolstice of 2026
 ```
 
