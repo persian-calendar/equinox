@@ -15,7 +15,7 @@ epoch milliseconds using the TAI−UTC leap-second table.
 ## Usage
 
 ```kotlin
-import io.github.persiancalendar.Equinox
+import io.github.persiancalendar.equinox.Equinox
 
 val marchEquinox = Equinox.NorthwardEquinox of 2026 // Long, epoch millis (UTC)
 val juneSolstice = Equinox.NorthernSolstice of 2026
