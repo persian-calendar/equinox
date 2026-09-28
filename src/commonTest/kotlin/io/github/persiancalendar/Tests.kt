@@ -84,7 +84,7 @@ class Tests {
     @Test
     fun marchEquinoxSpotCheck() {
         MARCH_SPOT_CHECK.forEach { (year, expected) ->
-            val actual = Equinox.NORTHWARD_EQUINOX of year
+            val actual = Equinox.NorthwardEquinox of year
             val delta = abs(actual - expected)
             assertTrue(
                 delta < MAX_ERROR_MILLIS,
@@ -108,17 +108,17 @@ class Tests {
     @Test
     fun doesNotThrowAcrossExtendedRange() {
         (-2000..10000).forEach {
-            Equinox.NORTHWARD_EQUINOX of it
-            Equinox.NORTHERN_SOLSTICE of it
-            Equinox.SOUTHWARD_EQUINOX of it
-            Equinox.SOUTHERN_SOLSTICE of it
+            Equinox.NorthwardEquinox of it
+            Equinox.NorthernSolstice of it
+            Equinox.SouthwardEquinox of it
+            Equinox.SouthernSolstice of it
         }
     }
 
     @Test
     fun iranGroundTruthWithinTolerance() {
         IRAN_GROUND_TRUTH.forEach { (year, expectedMillis, toleranceSeconds) ->
-            val actual = Equinox.NORTHWARD_EQUINOX of year
+            val actual = Equinox.NorthwardEquinox of year
             val delta = abs(actual - expectedMillis)
             println(
                 "Nowruz declared by University of Tehran for $year A.D.: off by ${delta}ms " +

@@ -31,13 +31,13 @@ enum class Equinox(
     private val day: Int,
 ) {
     /** Spring equinox for the northern hemisphere (March). */
-    NORTHWARD_EQUINOX(0.0, 3, 20),
+    NorthwardEquinox(0.0, 3, 20),
     /** Summer solstice for the northern hemisphere (June). */
-    NORTHERN_SOLSTICE(90.0, 6, 21),
+    NorthernSolstice(90.0, 6, 21),
     /** Fall equinox for the northern hemisphere (September). */
-    SOUTHWARD_EQUINOX(180.0, 9, 22),
+    SouthwardEquinox(180.0, 9, 22),
     /** Winter solstice for the northern hemisphere (December). */
-    SOUTHERN_SOLSTICE(270.0, 12, 21);
+    SouthernSolstice(270.0, 12, 21);
 
     /** The instant of this season in the given Gregorian year, as Unix/POSIX epoch milliseconds. */
     infix fun of(year: Int): Long {
