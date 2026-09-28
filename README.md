@@ -17,10 +17,10 @@ epoch milliseconds using the TAI−UTC leap-second table.
 ```kotlin
 import io.github.persiancalendar.Equinox
 
-val marchEquinox = Equinox.NORTHWARD_EQUINOX of 2026 // Long, epoch millis (UTC)
-val juneSolstice = Equinox.NORTHERN_SOLSTICE of 2026
-val septEquinox  = Equinox.SOUTHWARD_EQUINOX of 2026
-val decSolstice  = Equinox.SOUTHERN_SOLSTICE of 2026
+val marchEquinox = Equinox.NorthwardEquinox of 2026 // Long, epoch millis (UTC)
+val juneSolstice = Equinox.NorthernSolstice of 2026
+val septEquinox  = Equinox.SouthwardEQUINOX of 2026
+val decSolstice  = Equinox.SouthernSolstice of 2026
 ```
 
 `of` returns the season instant as Unix/POSIX epoch milliseconds.
