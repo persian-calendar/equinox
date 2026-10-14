@@ -6,3 +6,4 @@ local.properties
 kotlin-js-store/
 .kotlin
 .DS_Store
+web/build
