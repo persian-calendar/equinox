@@ -7,7 +7,6 @@ import io.github.persiancalendar.equinox.web.dom.Date
 import io.github.persiancalendar.equinox.web.dom.DomElement
 import io.github.persiancalendar.equinox.web.dom.document
 import io.github.persiancalendar.equinox.web.dom.setInterval
-import io.github.persiancalendar.equinox.web.dom.setTimeout
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.math.roundToInt
 
@@ -22,10 +21,7 @@ private const val TEHRAN_OFFSET = (3.5 * 3600 * 1000).toLong()
 /** Nowruz of the Gregorian year Y falls in the Persian year Y - 621. */
 private const val NOWRUZ_YEAR_OFFSET = 621
 
-/** How long one fold of a card takes; must match `--fold` in index.html. */
-private const val FOLD_MILLIS = 220
-
-/** The countdown is recomputed this often; a card only folds when its digit changes. */
+/** The countdown is recomputed this often; a card only fades when its digit changes. */
 private const val TICK_MILLIS = 100
 
 /** The clock turns gold during the last ten seconds. */
@@ -34,7 +30,7 @@ private const val IMMINENT_MILLIS = 10 * SECOND
 /** How long the «نوروز مبارک» banner stays up once the equinox has passed. */
 private const val CELEBRATION_MILLIS = 20 * SECOND
 
-private const val FLIPPING_CLASS = "is-flipping"
+private const val CHANGING_CLASS = "is-changing"
 
 private val monthNames = listOf(
     "ژانویه", "فوریه", "مارس", "آوریل", "مه", "ژوئن",
@@ -90,31 +86,29 @@ private fun formatInstant(equinox: Long): String {
         " به وقت تهران"
 }
 
-/** Restarts the fold animation of [card] by toggling the state class. */
+/** Restarts the crossfade of [card] by toggling the state class. */
 @Suppress("UNUSED_EXPRESSION")
-private fun restartFold(card: DomElement) {
-    card.classList.remove(FLIPPING_CLASS)
+private fun restartCrossfade(card: DomElement) {
+    card.classList.remove(CHANGING_CLASS)
     // Reading a layout property flushes the removal, so that adding the class
     // back is seen as a fresh animation instead of no change at all.
     card.offsetHeight
-    card.classList.add(FLIPPING_CLASS)
+    card.classList.add(CHANGING_CLASS)
 }
 
-/** One flip card: two static halves plus the two folding leaves. */
+/** One card: the digit that is fading out on top of the digit that replaces it. */
 private class Digit(private val id: String) {
     private val card = element(id)
-    private val top = face(".face--top")
-    private val bottom = face(".face--bottom")
-    private val fallingLeaf = face(".face--flip-top")
-    private val risingLeaf = face(".face--flip-bottom")
+    private val previousDigit = layer(".digit--previous")
+    private val currentDigit = layer(".digit--current")
 
     private var value = -1
 
-    private fun face(selector: String): DomElement =
+    private fun layer(selector: String): DomElement =
         card.querySelector<DomElement>(selector) ?: error("#$id has no $selector")
 
-    private fun glyph(half: DomElement, digit: Int) {
-        half.setAttribute("data-v", persian(digit.toLong()))
+    private fun glyph(layer: DomElement, digit: Int) {
+        layer.setAttribute("data-v", persian(digit.toLong()))
     }
 
     fun show(digit: Int, animate: Boolean) {
@@ -122,24 +116,15 @@ private class Digit(private val id: String) {
         val previous = value
         value = digit
 
+        glyph(currentDigit, digit)
+
         if (previous < 0 || !animate) {
-            glyph(top, digit)
-            glyph(bottom, digit)
-            glyph(fallingLeaf, digit)
-            glyph(risingLeaf, digit)
+            glyph(previousDigit, digit)
             return
         }
 
-        glyph(top, digit)  // uncovered as the leaf falls
-        glyph(risingLeaf, digit)  // lands on the lower half when the fold ends
-        glyph(fallingLeaf, previous)  // the leaf that falls away
-        glyph(bottom, previous)  // visible until the rising leaf covers it
-
-        restartFold(card)
-
-        setTimeout({
-            if (value == digit) glyph(bottom, digit)
-        }, FOLD_MILLIS * 2 + 40)
+        glyph(previousDigit, previous)
+        restartCrossfade(card)
     }
 }
 

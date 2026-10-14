@@ -8,6 +8,8 @@
 	<link rel="manifest" href="manifest.webmanifest">
 	<meta name="theme-color" content="#05060f">
 	<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+	<link rel="icon" type="image/png" href="icons/icon-192.png">
+	<link rel="apple-touch-icon" href="icons/icon-192.png">
 	<style>
 :root {
 	color-scheme: dark;
@@ -22,13 +24,20 @@
 	--card-top: #241d3d;
 	--card-bottom: #17122a;
 	--digit-top: #fff8f2;
-	--digit-bottom: #ddd2f5;
 	--glow: 0;
 	--progress: 0;
-	--fold: 220ms;
+	--fade: 260ms;
 }
 
 * { box-sizing: border-box; }
+
+@font-face {
+	font-family: 'MarkaziTextDigits';
+	src: url('MarkaziTextDigits-VariableFont_wght.ttf') format('truetype');
+	font-weight: 400 700;
+	font-style: normal;
+	font-display: swap;
+}
 
 body {
 	margin: 0;
@@ -163,10 +172,10 @@ body {
 	justify-content: center;
 	gap: 1.6rem 1.9rem;
 	gap: clamp(.9rem, 3vw, 1.9rem);
-	--card-w: 3.9rem;
-	--card-h: 5.4rem;
-	--card-w: clamp(2.4rem, 8.4vw, 3.9rem);
-	--card-h: clamp(3.4rem, 12vw, 5.4rem);
+	--card-w: 4.6rem;
+	--card-h: 6.4rem;
+	--card-w: clamp(2.4rem, 8.6vw, 4.6rem);
+	--card-h: clamp(3.4rem, 12.5vw, 6.4rem);
 }
 
 .unit {
@@ -204,118 +213,82 @@ body {
 
 .card {
 	position: relative;
-	width: 3.9rem;
+	width: 4.6rem;
 	width: var(--card-w);
-	height: 5.4rem;
+	height: 6.4rem;
 	height: var(--card-h);
-	font-size: 3.4rem;
-	font-size: calc(var(--card-h) * .64);
+	font-size: 7rem;
+	font-size: calc(var(--card-h) * 1.08);
 	font-weight: 800;
 	line-height: 1;
-	border-radius: 14px;
+	border-radius: 16px;
 	background: #17122a;
 	background: var(--card-bottom);
-	perspective: 520px;
 	box-shadow:
 		0 16px 26px -18px rgba(0, 0, 0, .95),
 		0 0 0 1px rgba(255, 255, 255, .07);
 	transition: box-shadow .5s;
 }
 
-/* The two static halves. The upper one shows the new digit as soon as the
-   falling leaf uncovers it, the lower one keeps the old digit until the fold
-   is complete. */
-.face {
+/* The card is drawn as two halves with a hinge, like a split flap board. The
+   digits themselves are a single piece that sits on top of them, so a digit
+   always reads as one glyph and simply crossfades into the next one. */
+.shade {
 	position: absolute;
 	left: 0;
 	right: 0;
 	height: 50%;
-	overflow: hidden;
 	background: #241d3d;
 	background: var(--card-top);
 }
 
-.face--top {
+.shade--top {
 	top: 0;
-	border-radius: 14px 14px 0 0;
+	border-radius: 16px 16px 0 0;
 }
 
-.face--bottom {
+.shade--bottom {
 	bottom: 0;
-	border-radius: 0 0 14px 14px;
+	border-radius: 0 0 16px 16px;
 	background: #17122a;
 	background: var(--card-bottom);
 }
 
-/* One glyph per half, centred on the card so both halves line up. */
-.face::before {
-	content: attr(data-v);
+.digit {
 	position: absolute;
-	left: 0;
+	top: 0;
 	right: 0;
-	height: 200%;
+	bottom: 0;
+	left: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	font-family: 'MarkaziTextDigits', Georgia, 'Times New Roman', serif;
+	font-weight: 700;
+	line-height: 1;
+	color: #fff8f2;
+	color: var(--digit-top);
 	font-variant-numeric: tabular-nums;
 }
 
-.face--top::before {
-	top: 0;
-	color: #fff8f2;
-	color: var(--digit-top);
+.digit::before { content: attr(data-v); }
+
+/* The previous digit is on top and fades away, uncovering the next one. */
+.digit--previous { z-index: 2; }
+
+.card.is-changing .digit--previous {
+	animation: fade-out var(--fade) cubic-bezier(0, 0, 0.2, 1) forwards;
 }
 
-.face--bottom::before {
-	bottom: 0;
-	color: #ddd2f5;
-	color: var(--digit-bottom);
+@keyframes fade-out {
+	from { opacity: 1; }
+	to { opacity: 0; }
 }
 
-/* The folding leaves: `flip-top` falls away, `flip-bottom` rises into place
-   half a fold later. */
-.face--flip-top,
-.face--flip-bottom {
-	z-index: 2;
-	backface-visibility: hidden;
-	will-change: transform;
-}
-
-.face--flip-top {
-	top: 0;
-	transform-origin: center bottom;
-	box-shadow: inset 0 -10px 14px -14px rgba(0, 0, 0, .9);
-}
-
-.face--flip-bottom {
-	bottom: 0;
-	transform: rotateX(90deg);
-	transform-origin: center top;
-}
-
-.card.is-flipping .face--flip-top {
-	animation: fold-top var(--fold) cubic-bezier(.4, 0, .7, .2) forwards;
-}
-
-.card.is-flipping .face--flip-bottom {
-	animation: fold-bottom var(--fold) cubic-bezier(.3, .7, .5, 1) var(--fold) forwards;
-}
-
-@keyframes fold-top {
-	from { transform: rotateX(0deg); }
-	to { transform: rotateX(-90deg); }
-}
-
-@keyframes fold-bottom {
-	from { transform: rotateX(90deg); }
-	to { transform: rotateX(0deg); }
-}
-
-/* Without CSS animations the leaves would freeze over the digits, so they are
-   dropped and the static halves (always up to date) are shown instead. */
-@supports not (animation-name: fold-top) {
-	.face--flip-top,
-	.face--flip-bottom { display: none; }
+/* Without CSS animations the fading copy would stay on top of the new digit,
+   so it is dropped and the current digit is shown on its own. */
+@supports not (animation-name: fade-out) {
+	.digit--previous { display: none; }
 }
 
 /* The hinge between the halves, which also hides the seam between them. */
@@ -334,18 +307,15 @@ body {
 }
 
 @supports (background-clip: text) or (-webkit-background-clip: text) {
-	.face--top::before,
-	.face--flip-top::before {
-		background-image: linear-gradient(180deg, #fffaf3, #ffd9a0);
-		-webkit-background-clip: text;
-		background-clip: text;
-		-webkit-text-fill-color: transparent;
-		color: transparent;
-	}
-
-	.face--bottom::before,
-	.face--flip-bottom::before {
-		background-image: linear-gradient(180deg, #f1e9ff, #bcaaee);
+	.digit::before {
+		/* Warm above the hinge, cool below it, like the two card halves. */
+		background-image: linear-gradient(
+			180deg,
+			#fffaf3 0%,
+			#ffe9c4 49.6%,
+			#e2d6ff 50.4%,
+			#c3b3ee 100%
+		);
 		-webkit-background-clip: text;
 		background-clip: text;
 		-webkit-text-fill-color: transparent;
@@ -361,8 +331,7 @@ body {
 		0 0 42px -6px rgba(255, 170, 70, .55);
 }
 
-#app.is-imminent .face--top::before,
-#app.is-imminent .face--flip-top::before {
+#app.is-imminent .digit::before {
 	filter: drop-shadow(0 0 12px rgba(255, 178, 72, .8));
 }
 
@@ -451,11 +420,8 @@ body {
 	.sky__stars,
 	.sky__glow { animation: none; }
 
-	.card.is-flipping .face--flip-top,
-	.card.is-flipping .face--flip-bottom {
-		animation-duration: 1ms;
-		animation-delay: 0ms;
-	}
+	/* A crossfade is not motion, so the digits still fade, but quickly. */
+	.card.is-changing .digit--previous { animation-duration: 90ms; }
 }
 	</style>
 </head>
@@ -478,22 +444,22 @@ body {
 				<div class="unit">
 					<div class="cards">
 						<div class="card" id="days-2">
-							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="shade shade--top" aria-hidden="true"></span>
+							<span class="shade shade--bottom" aria-hidden="true"></span>
+							<span class="digit digit--previous" data-v="۰" aria-hidden="true"></span>
+							<span class="digit digit--current" data-v="۰" aria-hidden="true"></span>
 						</div>
 						<div class="card" id="days-1">
-							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="shade shade--top" aria-hidden="true"></span>
+							<span class="shade shade--bottom" aria-hidden="true"></span>
+							<span class="digit digit--previous" data-v="۰" aria-hidden="true"></span>
+							<span class="digit digit--current" data-v="۰" aria-hidden="true"></span>
 						</div>
 						<div class="card" id="days-0">
-							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="shade shade--top" aria-hidden="true"></span>
+							<span class="shade shade--bottom" aria-hidden="true"></span>
+							<span class="digit digit--previous" data-v="۰" aria-hidden="true"></span>
+							<span class="digit digit--current" data-v="۰" aria-hidden="true"></span>
 						</div>
 					</div>
 					<span class="unit__label">روز<small>days</small></span>
@@ -502,16 +468,16 @@ body {
 				<div class="unit">
 					<div class="cards">
 						<div class="card" id="hours-1">
-							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="shade shade--top" aria-hidden="true"></span>
+							<span class="shade shade--bottom" aria-hidden="true"></span>
+							<span class="digit digit--previous" data-v="۰" aria-hidden="true"></span>
+							<span class="digit digit--current" data-v="۰" aria-hidden="true"></span>
 						</div>
 						<div class="card" id="hours-0">
-							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="shade shade--top" aria-hidden="true"></span>
+							<span class="shade shade--bottom" aria-hidden="true"></span>
+							<span class="digit digit--previous" data-v="۰" aria-hidden="true"></span>
+							<span class="digit digit--current" data-v="۰" aria-hidden="true"></span>
 						</div>
 					</div>
 					<span class="unit__label">ساعت<small>hours</small></span>
@@ -520,16 +486,16 @@ body {
 				<div class="unit">
 					<div class="cards">
 						<div class="card" id="minutes-1">
-							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="shade shade--top" aria-hidden="true"></span>
+							<span class="shade shade--bottom" aria-hidden="true"></span>
+							<span class="digit digit--previous" data-v="۰" aria-hidden="true"></span>
+							<span class="digit digit--current" data-v="۰" aria-hidden="true"></span>
 						</div>
 						<div class="card" id="minutes-0">
-							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="shade shade--top" aria-hidden="true"></span>
+							<span class="shade shade--bottom" aria-hidden="true"></span>
+							<span class="digit digit--previous" data-v="۰" aria-hidden="true"></span>
+							<span class="digit digit--current" data-v="۰" aria-hidden="true"></span>
 						</div>
 					</div>
 					<span class="unit__label">دقیقه<small>minutes</small></span>
@@ -538,16 +504,16 @@ body {
 				<div class="unit">
 					<div class="cards">
 						<div class="card" id="seconds-1">
-							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="shade shade--top" aria-hidden="true"></span>
+							<span class="shade shade--bottom" aria-hidden="true"></span>
+							<span class="digit digit--previous" data-v="۰" aria-hidden="true"></span>
+							<span class="digit digit--current" data-v="۰" aria-hidden="true"></span>
 						</div>
 						<div class="card" id="seconds-0">
-							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
-							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="shade shade--top" aria-hidden="true"></span>
+							<span class="shade shade--bottom" aria-hidden="true"></span>
+							<span class="digit digit--previous" data-v="۰" aria-hidden="true"></span>
+							<span class="digit digit--current" data-v="۰" aria-hidden="true"></span>
 						</div>
 					</div>
 					<span class="unit__label">ثانیه<small>seconds</small></span>

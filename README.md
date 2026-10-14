@@ -54,6 +54,18 @@ Validated against JPL DE440 (all four seasons):
 | 1900–2100 | 0.23 s  | 0.70 s |
 | 2002–2022 | 0.22 s  | 0.66 s |
 
+## Web demo
+
+[`web/`](web) is a small HTML page that counts down to the next March equinox —
+the days, hours, minutes and seconds left until Nowruz — calling the library
+from Kotlin/JS:
+
+https://persian-calendar.github.io/equinox/
+
+```sh
+./gradlew :web:jsBrowserDevelopmentRun   # then open http://localhost:8080/
+```
+
 ## Building and testing
 
 ```sh

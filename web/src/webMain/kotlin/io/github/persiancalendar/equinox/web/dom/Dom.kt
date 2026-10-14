@@ -49,5 +49,3 @@ external class Date {
 }
 
 external fun setInterval(handler: () -> Unit, timeout: Int): Int
-
-external fun setTimeout(handler: () -> Unit, timeout: Int): Int
