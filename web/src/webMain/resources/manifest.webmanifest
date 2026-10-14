@@ -1,0 +1,25 @@
+{
+  "name": "شمارش معکوس تا نوروز",
+  "name_localized": {
+    "en": { "value": "Countdown to Nowruz", "lang": "en", "dir": "ltr" }
+  },
+  "short_name": "نوروز",
+  "short_name_localized": {
+    "en": { "value": "Nowruz", "lang": "en", "dir": "ltr" }
+  },
+  "description": "شمارش معکوس تا لحظهٔ اعتدال بهاری (نوروز)",
+  "description_localized": {
+    "en": { "value": "Countdown to the March equinox (Nowruz)", "lang": "en", "dir": "ltr" }
+  },
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#05060f",
+  "theme_color": "#05060f",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

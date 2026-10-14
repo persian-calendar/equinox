@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Equinox">
+	<defs>
+		<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#05060f"/>
+			<stop offset=".45" stop-color="#140d29"/>
+			<stop offset=".78" stop-color="#2b1039"/>
+			<stop offset="1" stop-color="#4a1636"/>
+		</linearGradient>
+		<radialGradient id="glow" cx=".5" cy=".74" r=".66">
+			<stop offset="0" stop-color="#ffb056" stop-opacity=".9"/>
+			<stop offset=".45" stop-color="#ff7a46" stop-opacity=".38"/>
+			<stop offset="1" stop-color="#ff7a46" stop-opacity="0"/>
+		</radialGradient>
+		<linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#ffeec2"/>
+			<stop offset="1" stop-color="#ffab4d"/>
+		</linearGradient>
+		<clipPath id="disc">
+			<rect width="512" height="512" rx="112"/>
+		</clipPath>
+	</defs>
+	<g clip-path="url(#disc)">
+		<rect width="512" height="512" fill="url(#sky)"/>
+		<circle cx="256" cy="380" r="210" fill="url(#glow)"/>
+		<circle cx="140" cy="128" r="7" fill="#ffffff" opacity=".85"/>
+		<circle cx="344" cy="96" r="5" fill="#e2ecff" opacity=".7"/>
+		<circle cx="248" cy="180" r="4" fill="#fffaf0" opacity=".6"/>
+		<circle cx="408" cy="212" r="6" fill="#cddeff" opacity=".75"/>
+		<circle cx="92" cy="250" r="4.5" fill="#ffecd0" opacity=".6"/>
+		<path d="M156 380a100 100 0 0 1 200 0z" fill="url(#sun)"/>
+		<rect x="86" y="374" width="340" height="7" rx="3.5" fill="#ffd9a0" opacity=".9"/>
+	</g>
+</svg>

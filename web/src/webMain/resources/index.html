@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>شمارش معکوس تا نوروز</title>
+	<meta name="description" content="شمارش معکوس تا لحظهٔ اعتدال بهاری (نوروز) با محاسبهٔ دقیق کتابخانهٔ Equinox">
+	<link rel="manifest" href="manifest.webmanifest">
+	<meta name="theme-color" content="#05060f">
+	<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+	<style>
+:root {
+	color-scheme: dark;
+	--bg-top: #05060f;
+	--bg-mid: #140d29;
+	--bg-low: #2b1039;
+	--bg-horizon: #4a1636;
+	--text: #f4efff;
+	--muted: #a79fc6;
+	--accent: #7c9cff;
+	--gold: #ffc35c;
+	--card-top: #241d3d;
+	--card-bottom: #17122a;
+	--digit-top: #fff8f2;
+	--digit-bottom: #ddd2f5;
+	--glow: 0;
+	--progress: 0;
+	--fold: 220ms;
+}
+
+* { box-sizing: border-box; }
+
+body {
+	margin: 0;
+	min-height: 100%;
+	background: #05060f;
+	background: var(--bg-top);
+	color: #f4efff;
+	color: var(--text);
+	font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, 'Noto Sans Arabic', sans-serif;
+	-webkit-text-size-adjust: 100%;
+}
+
+/* The sky is decoration only; it may fall back to a flat background without
+   affecting the countdown. */
+.sky {
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	overflow: hidden;
+	background: linear-gradient(180deg, #05060f, #140d29 42%, #2b1039 74%, #4a1636);
+}
+
+.sky__stars {
+	position: absolute;
+	inset: 0;
+	opacity: .55;
+	background-image:
+		radial-gradient(circle at 12% 18%, rgba(255, 255, 255, .95) 0 1.1px, transparent 1.7px),
+		radial-gradient(circle at 68% 9%, rgba(226, 236, 255, .8) 0 1px, transparent 1.6px),
+		radial-gradient(circle at 39% 47%, rgba(255, 250, 240, .7) 0 .9px, transparent 1.4px),
+		radial-gradient(circle at 84% 39%, rgba(205, 222, 255, .85) 0 1.2px, transparent 1.8px),
+		radial-gradient(circle at 22% 72%, rgba(255, 236, 205, .75) 0 1px, transparent 1.5px),
+		radial-gradient(circle at 93% 83%, rgba(255, 255, 255, .6) 0 .9px, transparent 1.4px);
+	background-size: 340px 300px;
+	animation: twinkle 8s ease-in-out infinite alternate;
+}
+
+.sky__glow {
+	position: absolute;
+	left: 50%;
+	bottom: -40vmax;
+	width: 175vmax;
+	height: 105vmax;
+	margin-left: -87.5vmax;
+	background: radial-gradient(closest-side, rgba(255, 168, 74, .5), rgba(255, 112, 62, .18) 46%, transparent 72%);
+	opacity: .3;
+	opacity: calc(.25 + var(--glow) * .75);
+	animation: breathe 11s ease-in-out infinite;
+}
+
+.sky__horizon {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 30vh;
+	background: linear-gradient(180deg, transparent, rgba(255, 138, 72, .1) 62%, rgba(255, 176, 96, .24));
+}
+
+@keyframes twinkle {
+	from { opacity: .35; }
+	to { opacity: .7; }
+}
+
+@keyframes breathe {
+	0%, 100% { transform: scale(1); }
+	50% { transform: scale(1.06); }
+}
+
+#app {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	min-height: 100dvh;
+}
+
+.stage {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1.5rem;
+	padding: 3rem 1.25rem 1.5rem;
+	text-align: center;
+}
+
+.kicker {
+	margin: 0;
+	font-size: .74rem;
+	font-weight: 600;
+	letter-spacing: .3em;
+	color: #a79fc6;
+	color: var(--muted);
+}
+
+.title {
+	margin: -.6rem 0 0;
+	font-size: 2.6rem;
+	font-size: clamp(1.75rem, 5.5vw, 2.75rem);
+	font-weight: 800;
+	line-height: 1.15;
+}
+
+.title__year {
+	color: #ffc35c;
+	color: var(--gold);
+}
+
+.subtitle {
+	margin: 0;
+	max-width: 34rem;
+	font-size: .95rem;
+	font-size: clamp(.85rem, 2.4vw, 1rem);
+	line-height: 1.9;
+	color: #a79fc6;
+	color: var(--muted);
+}
+
+.subtitle time {
+	color: #f4efff;
+	color: var(--text);
+}
+
+.clock {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 1.6rem 1.9rem;
+	gap: clamp(.9rem, 3vw, 1.9rem);
+	--card-w: 3.9rem;
+	--card-h: 5.4rem;
+	--card-w: clamp(2.4rem, 8.4vw, 3.9rem);
+	--card-h: clamp(3.4rem, 12vw, 5.4rem);
+}
+
+.unit {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: .65rem;
+}
+
+.cards {
+	display: flex;
+	/* Digits are always written left to right, even inside an RTL page. */
+	direction: ltr;
+	gap: .35rem;
+	gap: clamp(.2rem, 1vw, .45rem);
+}
+
+.unit__label {
+	font-size: .78rem;
+	font-weight: 600;
+	letter-spacing: .16em;
+	color: #a79fc6;
+	color: var(--muted);
+}
+
+.unit__label small {
+	display: block;
+	margin-top: .1rem;
+	font-size: .62rem;
+	font-weight: 500;
+	letter-spacing: .22em;
+	text-transform: uppercase;
+	opacity: .65;
+}
+
+.card {
+	position: relative;
+	width: 3.9rem;
+	width: var(--card-w);
+	height: 5.4rem;
+	height: var(--card-h);
+	font-size: 3.4rem;
+	font-size: calc(var(--card-h) * .64);
+	font-weight: 800;
+	line-height: 1;
+	border-radius: 14px;
+	background: #17122a;
+	background: var(--card-bottom);
+	perspective: 520px;
+	box-shadow:
+		0 16px 26px -18px rgba(0, 0, 0, .95),
+		0 0 0 1px rgba(255, 255, 255, .07);
+	transition: box-shadow .5s;
+}
+
+/* The two static halves. The upper one shows the new digit as soon as the
+   falling leaf uncovers it, the lower one keeps the old digit until the fold
+   is complete. */
+.face {
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 50%;
+	overflow: hidden;
+	background: #241d3d;
+	background: var(--card-top);
+}
+
+.face--top {
+	top: 0;
+	border-radius: 14px 14px 0 0;
+}
+
+.face--bottom {
+	bottom: 0;
+	border-radius: 0 0 14px 14px;
+	background: #17122a;
+	background: var(--card-bottom);
+}
+
+/* One glyph per half, centred on the card so both halves line up. */
+.face::before {
+	content: attr(data-v);
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 200%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-variant-numeric: tabular-nums;
+}
+
+.face--top::before {
+	top: 0;
+	color: #fff8f2;
+	color: var(--digit-top);
+}
+
+.face--bottom::before {
+	bottom: 0;
+	color: #ddd2f5;
+	color: var(--digit-bottom);
+}
+
+/* The folding leaves: `flip-top` falls away, `flip-bottom` rises into place
+   half a fold later. */
+.face--flip-top,
+.face--flip-bottom {
+	z-index: 2;
+	backface-visibility: hidden;
+	will-change: transform;
+}
+
+.face--flip-top {
+	top: 0;
+	transform-origin: center bottom;
+	box-shadow: inset 0 -10px 14px -14px rgba(0, 0, 0, .9);
+}
+
+.face--flip-bottom {
+	bottom: 0;
+	transform: rotateX(90deg);
+	transform-origin: center top;
+}
+
+.card.is-flipping .face--flip-top {
+	animation: fold-top var(--fold) cubic-bezier(.4, 0, .7, .2) forwards;
+}
+
+.card.is-flipping .face--flip-bottom {
+	animation: fold-bottom var(--fold) cubic-bezier(.3, .7, .5, 1) var(--fold) forwards;
+}
+
+@keyframes fold-top {
+	from { transform: rotateX(0deg); }
+	to { transform: rotateX(-90deg); }
+}
+
+@keyframes fold-bottom {
+	from { transform: rotateX(90deg); }
+	to { transform: rotateX(0deg); }
+}
+
+/* Without CSS animations the leaves would freeze over the digits, so they are
+   dropped and the static halves (always up to date) are shown instead. */
+@supports not (animation-name: fold-top) {
+	.face--flip-top,
+	.face--flip-bottom { display: none; }
+}
+
+/* The hinge between the halves, which also hides the seam between them. */
+.card::after {
+	content: "";
+	position: absolute;
+	z-index: 3;
+	top: 50%;
+	left: 0;
+	right: 0;
+	height: 1px;
+	margin-top: -.5px;
+	background: rgba(0, 0, 0, .7);
+	box-shadow: 0 1px 0 rgba(255, 255, 255, .07);
+	pointer-events: none;
+}
+
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+	.face--top::before,
+	.face--flip-top::before {
+		background-image: linear-gradient(180deg, #fffaf3, #ffd9a0);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+		color: transparent;
+	}
+
+	.face--bottom::before,
+	.face--flip-bottom::before {
+		background-image: linear-gradient(180deg, #f1e9ff, #bcaaee);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+		color: transparent;
+	}
+}
+
+/* The last seconds before the equinox: the clock turns gold. */
+#app.is-imminent .card {
+	box-shadow:
+		0 16px 26px -18px rgba(0, 0, 0, .95),
+		0 0 0 1px rgba(255, 195, 92, .5),
+		0 0 42px -6px rgba(255, 170, 70, .55);
+}
+
+#app.is-imminent .face--top::before,
+#app.is-imminent .face--flip-top::before {
+	filter: drop-shadow(0 0 12px rgba(255, 178, 72, .8));
+}
+
+#app.is-imminent .sky__glow {
+	opacity: .9;
+}
+
+.progress {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: .55rem;
+	width: 30rem;
+	width: min(30rem, 84vw);
+}
+
+.track {
+	width: 100%;
+	height: 5px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, .09);
+	overflow: hidden;
+}
+
+.track__fill {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border-radius: 999px;
+	background: linear-gradient(90deg, #7c9cff, #ffc35c);
+	transform: scaleX(0);
+	transform: scaleX(var(--progress));
+	transform-origin: right center;
+}
+
+.progress__note {
+	margin: 0;
+	font-size: .76rem;
+	letter-spacing: .04em;
+	color: #a79fc6;
+	color: var(--muted);
+}
+
+.banner {
+	margin: 0;
+	padding: .55rem 1.3rem;
+	border: 1px solid rgba(255, 195, 92, .45);
+	border-radius: 999px;
+	background: rgba(255, 195, 92, .12);
+	color: #ffc35c;
+	color: var(--gold);
+	font-size: .95rem;
+	font-weight: 700;
+	opacity: 0;
+	transform: translateY(.4rem);
+	transition: opacity .5s, transform .5s;
+}
+
+#app.is-nowruz .banner {
+	opacity: 1;
+	transform: none;
+}
+
+.credits {
+	position: relative;
+	z-index: 1;
+	padding: 0 1.25rem 1.75rem;
+	font-size: .75rem;
+	line-height: 2;
+	text-align: center;
+	color: #a79fc6;
+	color: var(--muted);
+}
+
+.credits a {
+	color: #7c9cff;
+	color: var(--accent);
+}
+
+@media (max-width: 30rem) {
+	.clock { gap: 1rem 1.1rem; }
+	.unit__label { font-size: .7rem; letter-spacing: .1em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sky__stars,
+	.sky__glow { animation: none; }
+
+	.card.is-flipping .face--flip-top,
+	.card.is-flipping .face--flip-bottom {
+		animation-duration: 1ms;
+		animation-delay: 0ms;
+	}
+}
+	</style>
+</head>
+<body>
+	<div id="app">
+		<div class="sky" aria-hidden="true">
+			<div class="sky__stars"></div>
+			<div class="sky__glow"></div>
+			<div class="sky__horizon"></div>
+		</div>
+
+		<main class="stage">
+			<p class="kicker">شمارش معکوس</p>
+			<h1 class="title">نوروز <span class="title__year" id="year">––</span></h1>
+			<p class="subtitle">
+				لحظهٔ اعتدال بهاری: <time id="instant">در حال محاسبه…</time>
+			</p>
+
+			<div class="clock" id="clock" role="timer" aria-live="off" aria-label="شمارش معکوس تا نوروز">
+				<div class="unit">
+					<div class="cards">
+						<div class="card" id="days-2">
+							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+						</div>
+						<div class="card" id="days-1">
+							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+						</div>
+						<div class="card" id="days-0">
+							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+						</div>
+					</div>
+					<span class="unit__label">روز<small>days</small></span>
+				</div>
+
+				<div class="unit">
+					<div class="cards">
+						<div class="card" id="hours-1">
+							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+						</div>
+						<div class="card" id="hours-0">
+							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+						</div>
+					</div>
+					<span class="unit__label">ساعت<small>hours</small></span>
+				</div>
+
+				<div class="unit">
+					<div class="cards">
+						<div class="card" id="minutes-1">
+							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+						</div>
+						<div class="card" id="minutes-0">
+							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+						</div>
+					</div>
+					<span class="unit__label">دقیقه<small>minutes</small></span>
+				</div>
+
+				<div class="unit">
+					<div class="cards">
+						<div class="card" id="seconds-1">
+							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+						</div>
+						<div class="card" id="seconds-0">
+							<span class="face face--top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--bottom" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-top" data-v="۰" aria-hidden="true"></span>
+							<span class="face face--flip-bottom" data-v="۰" aria-hidden="true"></span>
+						</div>
+					</div>
+					<span class="unit__label">ثانیه<small>seconds</small></span>
+				</div>
+			</div>
+
+			<p class="banner" id="banner">نوروز مبارک! 🌷</p>
+
+			<div class="progress">
+				<div class="track" role="presentation"><span class="track__fill" id="progress"></span></div>
+				<p class="progress__note" id="progress-note">…</p>
+			</div>
+		</main>
+
+		<footer class="credits">
+			<p>
+				لحظهٔ اعتدال بهاری با کتابخانهٔ
+				<a href="https://github.com/persian-calendar/equinox">Equinox</a>
+				(نظریهٔ VSOP87، نوتِیشن IAU2000B و پرش ثانیه‌های TAI−UTC) محاسبه شده است.
+			</p>
+		</footer>
+	</div>
+
+	<script src="web.js"></script>
+</body>
+</html>
