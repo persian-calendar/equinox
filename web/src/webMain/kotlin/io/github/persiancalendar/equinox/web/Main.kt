@@ -32,6 +32,9 @@ private const val CELEBRATION_MILLIS = 20 * SECOND
 
 private const val CHANGING_CLASS = "is-changing"
 
+/** The whole cascade budget, shared between the columns that change together. */
+private const val CASCADE_MILLIS = 150.0
+
 private val monthNames = listOf(
     "ژانویه", "فوریه", "مارس", "آوریل", "مه", "ژوئن",
     "ژوئیه", "اوت", "سپتامبر", "اکتبر", "نوامبر", "دسامبر",
@@ -86,9 +89,10 @@ private fun formatInstant(equinox: Long): String {
         " به وقت تهران"
 }
 
-/** Restarts the crossfade of [card] by toggling the state class. */
+/** Restarts the roll of [card], [delayMillis] into the cascade. */
 @Suppress("UNUSED_EXPRESSION")
-private fun restartCrossfade(card: DomElement) {
+private fun restartRoll(card: DomElement, delayMillis: Double) {
+    card.style.setProperty("--roll-delay", "${delayMillis}ms")
     card.classList.remove(CHANGING_CLASS)
     // Reading a layout property flushes the removal, so that adding the class
     // back is seen as a fresh animation instead of no change at all.
@@ -96,13 +100,16 @@ private fun restartCrossfade(card: DomElement) {
     card.classList.add(CHANGING_CLASS)
 }
 
-/** One card: the digit that is fading out on top of the digit that replaces it. */
+/** One card: the digit that rolls out while the digit that replaces it rolls in. */
 private class Digit(private val id: String) {
     private val card = element(id)
     private val previousDigit = layer(".digit--previous")
     private val currentDigit = layer(".digit--current")
 
     private var value = -1
+
+    /** The digit on screen, or -1 before the first paint. */
+    val current: Int get() = value
 
     private fun layer(selector: String): DomElement =
         card.querySelector<DomElement>(selector) ?: error("#$id has no $selector")
@@ -111,7 +118,7 @@ private class Digit(private val id: String) {
         layer.setAttribute("data-v", persian(digit.toLong()))
     }
 
-    fun show(digit: Int, animate: Boolean) {
+    fun show(digit: Int, animate: Boolean, delayMillis: Double) {
         if (digit == value) return
         val previous = value
         value = digit
@@ -124,7 +131,7 @@ private class Digit(private val id: String) {
         }
 
         glyph(previousDigit, previous)
-        restartCrossfade(card)
+        restartRoll(card, delayMillis)
     }
 }
 
@@ -133,11 +140,25 @@ private class Digits(ids: List<String>) {
     private val cards = ids.map { Digit(it) }
 
     fun show(number: Int, animate: Boolean) {
+        val digits = digitsOf(number)
+        // The columns start left to right, most significant first, dividing one
+        // shared budget between the columns that actually change.
+        val changing = digits.indices.filter { cards[it].current != digits[it] }
+        val step = if (changing.size > 1) CASCADE_MILLIS / (changing.size - 1) else 0.0
+        for (index in digits.indices) {
+            val order = changing.indexOf(index)
+            cards[index].show(digits[index], animate, if (order < 0) 0.0 else order * step)
+        }
+    }
+
+    private fun digitsOf(number: Int): List<Int> {
+        val digits = MutableList(cards.size) { 0 }
         var rest = number
-        for (index in cards.indices.reversed()) {
-            cards[index].show(rest % 10, animate)
+        for (index in digits.indices.reversed()) {
+            digits[index] = rest % 10
             rest /= 10
         }
+        return digits
     }
 }
 

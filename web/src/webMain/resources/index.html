@@ -273,16 +273,89 @@ body {
 
 .digit::before { content: attr(data-v); }
 
-/* The previous digit is on top and fades away, uncovering the next one. */
-.digit--previous { z-index: 2; }
-
-.card.is-changing .digit--previous {
-	animation: fade-out var(--fade) cubic-bezier(0, 0, 0.2, 1) forwards;
+/* The previous digit sits on top of the digit that replaces it; the two
+   crossfade, and where the easing functions below exist they also roll. */
+.digit--previous {
+	z-index: 2;
+	opacity: 0;
 }
+
+/* Four channels run on two clocks, each an analytic second-order step response
+   p(t) sampled into a linear() easing:
+
+     offset  dy = .59375 * (1 - p)   zeta .55, 353 ms   (overshoots)
+     scale    s = .3984 + .6016 * p  zeta 1,   278 ms
+     alpha    a = p                  zeta 1,   276 ms
+     blur     s = .125 * (1 - p)     zeta .91, 398 ms
+
+   Because each channel is linear in p, animating its endpoint with p as the
+   easing reproduces the curve exactly. Position needs a spring of its own:
+   it overshoots where size and opacity never do. Counting down, the departing
+   glyph leaves upward and the arriving one enters from below. */
+.card {
+	--roll-entry: .59375em;
+	--roll-born: .3984;
+	--roll-blur: .125em;
+	--roll-delay: 0ms;
+	--t-offset: 390ms;
+	--t-scale: 300ms;
+	--t-alpha: 300ms;
+	--t-blur: 398ms;
+	--ease-offset: linear(0, 0.014, 0.053, 0.111, 0.183, 0.265, 0.352, 0.443, 0.532, 0.619, 0.702, 0.778, 0.847, 0.908, 0.961, 1.006, 1.043, 1.072, 1.095, 1.11, 1.12, 1.125, 1.126, 1.123, 1.118, 1.11, 1.1, 1.089, 1.078, 1.067, 1.055, 1.045, 1.034, 1.025, 1.017, 1.009, 1.003, 0.998, 0.993, 0.99, 1);
+	--ease-scale: linear(0, 0.046, 0.148, 0.271, 0.393, 0.505, 0.603, 0.686, 0.754, 0.808, 0.852, 0.886, 0.913, 0.934, 0.95, 0.962, 0.972, 0.979, 0.984, 0.988, 1);
+	--ease-alpha: linear(0, 0.047, 0.15, 0.273, 0.396, 0.509, 0.607, 0.689, 0.757, 0.812, 0.855, 0.889, 0.915, 0.936, 0.951, 0.963, 0.973, 0.98, 0.985, 0.989, 1);
+	--ease-blur: linear(0, 0.041, 0.135, 0.253, 0.375, 0.491, 0.594, 0.683, 0.756, 0.816, 0.863, 0.9, 0.929, 0.95, 0.966, 0.977, 0.985, 0.991, 0.995, 0.997, 1);
+}
+
+@keyframes roll-in-offset { from { translate: 0 var(--roll-entry); } to { translate: 0 0; } }
+
+@keyframes roll-in-scale { from { scale: var(--roll-born); } to { scale: 1; } }
+
+@keyframes roll-in-alpha { from { opacity: 0; } to { opacity: 1; } }
+
+@keyframes roll-in-blur { from { filter: blur(var(--roll-blur)); } to { filter: blur(0); } }
+
+@keyframes roll-out-offset { from { translate: 0 0; } to { translate: 0 calc(-1 * var(--roll-entry)); } }
+
+@keyframes roll-out-scale { from { scale: 1; } to { scale: var(--roll-born); } }
+
+@keyframes roll-out-alpha { from { opacity: 1; } to { opacity: 0; } }
+
+@keyframes roll-out-blur { from { filter: blur(0); } to { filter: blur(var(--roll-blur)); } }
 
 @keyframes fade-out {
 	from { opacity: 1; }
 	to { opacity: 0; }
+}
+
+/* Backwards fill only, so during the cascade delay the column still shows the
+   outgoing glyph at rest and the incoming one has not been born yet. */
+@supports (animation-timing-function: linear(0, 1)) {
+	.card.is-changing .digit--current,
+	.card.is-changing .digit--previous {
+		animation-delay: var(--roll-delay);
+		animation-fill-mode: backwards;
+	}
+
+	.card.is-changing .digit--current {
+		animation-name: roll-in-offset, roll-in-scale, roll-in-alpha, roll-in-blur;
+		animation-duration: var(--t-offset), var(--t-scale), var(--t-alpha), var(--t-blur);
+		animation-timing-function: var(--ease-offset), var(--ease-scale), var(--ease-alpha), var(--ease-blur);
+	}
+
+	.card.is-changing .digit--previous {
+		animation-name: roll-out-offset, roll-out-scale, roll-out-alpha, roll-out-blur;
+		animation-duration: var(--t-offset), var(--t-scale), var(--t-alpha), var(--t-blur);
+		animation-timing-function: var(--ease-offset), var(--ease-scale), var(--ease-alpha), var(--ease-blur);
+	}
+}
+
+/* Older browsers get a plain crossfade instead of the roll. */
+@supports not (animation-timing-function: linear(0, 1)) {
+	.card.is-changing .digit--previous {
+		opacity: 1;
+		animation: fade-out var(--fade) cubic-bezier(0, 0, 0.2, 1) forwards;
+	}
 }
 
 /* Without CSS animations the fading copy would stay on top of the new digit,
@@ -420,8 +493,16 @@ body {
 	.sky__stars,
 	.sky__glow { animation: none; }
 
-	/* A crossfade is not motion, so the digits still fade, but quickly. */
-	.card.is-changing .digit--previous { animation-duration: 90ms; }
+	/* Keep the crossfade but drop the roll: no travel, no scale, no blur. */
+	.card {
+		--roll-entry: 0em;
+		--roll-born: 1;
+		--roll-blur: 0em;
+		--t-offset: 90ms;
+		--t-scale: 90ms;
+		--t-alpha: 90ms;
+		--t-blur: 90ms;
+	}
 }
 	</style>
 </head>
