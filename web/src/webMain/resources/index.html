@@ -213,6 +213,10 @@ body {
 
 .card {
 	position: relative;
+	/* The card is the window the digits roll inside: the travel is most of the
+	   card's height, so without this the digits would spill over their
+	   neighbours. */
+	overflow: hidden;
 	width: 4.6rem;
 	width: var(--card-w);
 	height: 6.4rem;
@@ -230,9 +234,9 @@ body {
 	transition: box-shadow .5s;
 }
 
-/* The card is drawn as two halves with a hinge, like a split flap board. The
-   digits themselves are a single piece that sits on top of them, so a digit
-   always reads as one glyph and simply crossfades into the next one. */
+/* The card is drawn as two halves, like a split flap board. The digits are each a
+   single piece that sits on top of them and rolls, so a digit always reads as one
+   glyph on the way in and on the way out. */
 .shade {
 	position: absolute;
 	left: 0;
@@ -273,25 +277,27 @@ body {
 
 .digit::before { content: attr(data-v); }
 
-/* The previous digit sits on top of the digit that replaces it; the two
-   crossfade, and where the easing functions below exist they also roll. */
+/* The previous digit sits under the digit that replaces it; the two crossfade,
+   and where the easing functions below exist they also roll. The current digit
+   comes later in the markup, so it is the one on top. */
 .digit--previous {
-	z-index: 2;
 	opacity: 0;
 }
 
-/* Four channels run on two clocks, each an analytic second-order step response
-   p(t) sampled into a linear() easing:
+/* The four channels of the roll, and the measured curves they run on:
 
      offset  dy = .59375 * (1 - p)   zeta .55, 353 ms   (overshoots)
      scale    s = .3984 + .6016 * p  zeta 1,   278 ms
      alpha    a = p                  zeta 1,   276 ms
      blur     s = .125 * (1 - p)     zeta .91, 398 ms
 
-   Because each channel is linear in p, animating its endpoint with p as the
-   easing reproduces the curve exactly. Position needs a spring of its own:
-   it overshoots where size and opacity never do. Counting down, the departing
-   glyph leaves upward and the arriving one enters from below. */
+   Each is an analytic second-order step response p(t) sampled into a linear()
+   easing. Because every channel is linear in p, animating its endpoint with p as
+   the easing reproduces the curve exactly. Position needs a spring of its own: it
+   overshoots where size and opacity never do.
+
+   Counting down, the arriving glyph enters from above and the departing one leaves
+   downward, so the roll travels the way the clock runs. */
 .card {
 	--roll-entry: .59375em;
 	--roll-born: .3984;
@@ -307,7 +313,7 @@ body {
 	--ease-blur: linear(0, 0.041, 0.135, 0.253, 0.375, 0.491, 0.594, 0.683, 0.756, 0.816, 0.863, 0.9, 0.929, 0.95, 0.966, 0.977, 0.985, 0.991, 0.995, 0.997, 1);
 }
 
-@keyframes roll-in-offset { from { translate: 0 var(--roll-entry); } to { translate: 0 0; } }
+@keyframes roll-in-offset { from { translate: 0 calc(-1 * var(--roll-entry)); } to { translate: 0 0; } }
 
 @keyframes roll-in-scale { from { scale: var(--roll-born); } to { scale: 1; } }
 
@@ -315,7 +321,7 @@ body {
 
 @keyframes roll-in-blur { from { filter: blur(var(--roll-blur)); } to { filter: blur(0); } }
 
-@keyframes roll-out-offset { from { translate: 0 0; } to { translate: 0 calc(-1 * var(--roll-entry)); } }
+@keyframes roll-out-offset { from { translate: 0 0; } to { translate: 0 var(--roll-entry); } }
 
 @keyframes roll-out-scale { from { scale: 1; } to { scale: var(--roll-born); } }
 
@@ -358,30 +364,15 @@ body {
 	}
 }
 
-/* Without CSS animations the fading copy would stay on top of the new digit,
-   so it is dropped and the current digit is shown on its own. */
+/* Without CSS animations the fading copy would be left showing underneath the new
+   digit, so it is dropped and the current digit is shown on its own. */
 @supports not (animation-name: fade-out) {
 	.digit--previous { display: none; }
 }
 
-/* The hinge between the halves, which also hides the seam between them. */
-.card::after {
-	content: "";
-	position: absolute;
-	z-index: 3;
-	top: 50%;
-	left: 0;
-	right: 0;
-	height: 1px;
-	margin-top: -.5px;
-	background: rgba(0, 0, 0, .7);
-	box-shadow: 0 1px 0 rgba(255, 255, 255, .07);
-	pointer-events: none;
-}
-
 @supports (background-clip: text) or (-webkit-background-clip: text) {
 	.digit::before {
-		/* Warm above the hinge, cool below it, like the two card halves. */
+		/* Warm at the top, cool at the bottom, like the two card halves. */
 		background-image: linear-gradient(
 			180deg,
 			#fffaf3 0%,
