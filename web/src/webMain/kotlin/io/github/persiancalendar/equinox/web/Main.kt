@@ -6,8 +6,7 @@ import io.github.persiancalendar.equinox.Equinox
 import kotlin.js.ExperimentalWasmJsInterop
 
 external fun equinoxReady(equinoxForYear: (Int) -> Double)
-private fun marchEquinox(year: Int): Double = (Equinox.NorthwardEquinox of year).toDouble()
 
 fun main() {
-    equinoxReady(::marchEquinox)
+    equinoxReady { year: Int -> (Equinox.NorthwardEquinox of year).toDouble() }
 }
