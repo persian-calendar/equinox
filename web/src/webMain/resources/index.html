@@ -477,6 +477,9 @@ body {
 
 @media (max-width: 30rem) {
 	.clock { gap: 1rem 1.1rem; }
+
+	.clock .unit--days { flex: 0 0 100%; }
+
 	.unit__label { font-size: .7rem; letter-spacing: .1em; }
 }
 
@@ -513,7 +516,7 @@ body {
 			</p>
 
 			<div dir="ltr" class="clock" id="clock" role="timer" aria-live="off" aria-label="شمارش معکوس تا نوروز">
-				<div class="unit">
+				<div class="unit unit--days">
 					<div class="cards">
 						<div class="card" id="days-2">
 							<span class="shade shade--top" aria-hidden="true"></span>
