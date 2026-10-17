@@ -6,27 +6,95 @@
 	<title>شمارش معکوس تا نوروز</title>
 	<meta name="description" content="شمارش معکوس تا لحظهٔ اعتدال بهاری (نوروز) با محاسبهٔ دقیق کتابخانهٔ Equinox">
 	<link rel="manifest" href="manifest.webmanifest">
-	<meta name="theme-color" content="#05060f">
+	<meta name="theme-color" content="#d3ecdf" media="(prefers-color-scheme: light)">
+	<meta name="theme-color" content="#05060f" media="(prefers-color-scheme: dark)">
 	<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
 	<link rel="icon" type="image/png" href="icons/icon-192.png">
 	<link rel="apple-touch-icon" href="icons/icon-192.png">
 	<style>
+/* Spring when the system asks for light: new grass and a pale green sky, the season the
+   countdown is heading into. The dark palette below is the original night version,
+   unchanged. */
 :root {
-	color-scheme: dark;
-	--bg-top: #05060f;
-	--bg-mid: #140d29;
-	--bg-low: #2b1039;
-	--bg-horizon: #4a1636;
-	--text: #f4efff;
-	--muted: #a79fc6;
-	--accent: #7c9cff;
-	--gold: #ffc35c;
-	--card-top: #241d3d;
-	--card-bottom: #17122a;
-	--digit-top: #fff8f2;
+	color-scheme: light dark;
+	--bg-top: #d3ecdf;
+	--bg-mid: #e2f4e3;
+	--bg-low: #eef7d8;
+	--bg-horizon: #cbe8a8;
+	--text: #132a1d;
+	--muted: #47614f;
+	--accent: #1c6b46;
+	--gold: #a45c07;
+	--card-top: #ffffff;
+	--card-bottom: #e9f4e8;
+	--card-shadow: rgba(20, 60, 40, .2);
+	--card-ring: rgba(30, 80, 55, .12);
+	--digit-top: #1d3a2c;
+	--digit-1: #2c5040;
+	--digit-2: #1d3a2c;
+	--digit-3: #234a37;
+	--digit-4: #15302a;
+	--sun-a: rgba(255, 226, 140, .6);
+	--sun-b: rgba(255, 198, 96, .26);
+	--horizon-a: rgba(150, 210, 120, .35);
+	--horizon-b: rgba(120, 195, 100, .5);
+	--track: rgba(19, 42, 29, .12);
+	--track-from: #1c6b46;
+	--track-to: #d08a1e;
+	--gold-border: rgba(164, 92, 7, .45);
+	--gold-soft: rgba(210, 140, 40, .16);
+	--imminent-ring: rgba(184, 106, 8, .62);
+	--imminent-glow: rgba(255, 146, 34, .72);
+	--digit-glow: rgba(190, 110, 15, .75);
+	--star-1: rgba(60, 120, 85, .45);
+	--star-2: rgba(80, 132, 98, .38);
+	--star-3: rgba(96, 140, 96, .32);
+	--star-4: rgba(58, 112, 80, .42);
+	--star-5: rgba(104, 138, 88, .34);
+	--star-6: rgba(70, 124, 92, .28);
 	--glow: 0;
 	--progress: 0;
 	--fade: 260ms;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg-top: #05060f;
+		--bg-mid: #140d29;
+		--bg-low: #2b1039;
+		--bg-horizon: #4a1636;
+		--text: #f4efff;
+		--muted: #a79fc6;
+		--accent: #7c9cff;
+		--gold: #ffc35c;
+		--card-top: #241d3d;
+		--card-bottom: #17122a;
+		--card-shadow: rgba(0, 0, 0, .95);
+		--card-ring: rgba(255, 255, 255, .07);
+		--digit-top: #fff8f2;
+		--digit-1: #fffaf3;
+		--digit-2: #ffe9c4;
+		--digit-3: #e2d6ff;
+		--digit-4: #c3b3ee;
+		--sun-a: rgba(255, 168, 74, .5);
+		--sun-b: rgba(255, 112, 62, .18);
+		--horizon-a: rgba(255, 138, 72, .1);
+		--horizon-b: rgba(255, 176, 96, .24);
+		--track: rgba(255, 255, 255, .09);
+		--track-from: #7c9cff;
+		--track-to: #ffc35c;
+		--gold-border: rgba(255, 195, 92, .45);
+		--gold-soft: rgba(255, 195, 92, .12);
+		--imminent-ring: rgba(255, 195, 92, .5);
+		--imminent-glow: rgba(255, 170, 70, .55);
+		--digit-glow: rgba(255, 178, 72, .8);
+		--star-1: rgba(255, 255, 255, .95);
+		--star-2: rgba(226, 236, 255, .8);
+		--star-3: rgba(255, 250, 240, .7);
+		--star-4: rgba(205, 222, 255, .85);
+		--star-5: rgba(255, 236, 205, .75);
+		--star-6: rgba(255, 255, 255, .6);
+	}
 }
 
 * { box-sizing: border-box; }
@@ -57,7 +125,8 @@ body {
 	inset: 0;
 	z-index: 0;
 	overflow: hidden;
-	background: linear-gradient(180deg, #05060f, #140d29 42%, #2b1039 74%, #4a1636);
+	background: var(--bg-top);
+	background: linear-gradient(180deg, var(--bg-top), var(--bg-mid) 42%, var(--bg-low) 74%, var(--bg-horizon));
 }
 
 .sky__stars {
@@ -65,12 +134,12 @@ body {
 	inset: 0;
 	opacity: .55;
 	background-image:
-		radial-gradient(circle at 12% 18%, rgba(255, 255, 255, .95) 0 1.1px, transparent 1.7px),
-		radial-gradient(circle at 68% 9%, rgba(226, 236, 255, .8) 0 1px, transparent 1.6px),
-		radial-gradient(circle at 39% 47%, rgba(255, 250, 240, .7) 0 .9px, transparent 1.4px),
-		radial-gradient(circle at 84% 39%, rgba(205, 222, 255, .85) 0 1.2px, transparent 1.8px),
-		radial-gradient(circle at 22% 72%, rgba(255, 236, 205, .75) 0 1px, transparent 1.5px),
-		radial-gradient(circle at 93% 83%, rgba(255, 255, 255, .6) 0 .9px, transparent 1.4px);
+		radial-gradient(circle at 12% 18%, var(--star-1) 0 1.1px, transparent 1.7px),
+		radial-gradient(circle at 68% 9%, var(--star-2) 0 1px, transparent 1.6px),
+		radial-gradient(circle at 39% 47%, var(--star-3) 0 .9px, transparent 1.4px),
+		radial-gradient(circle at 84% 39%, var(--star-4) 0 1.2px, transparent 1.8px),
+		radial-gradient(circle at 22% 72%, var(--star-5) 0 1px, transparent 1.5px),
+		radial-gradient(circle at 93% 83%, var(--star-6) 0 .9px, transparent 1.4px);
 	background-size: 340px 300px;
 	animation: twinkle 8s ease-in-out infinite alternate;
 }
@@ -82,7 +151,7 @@ body {
 	width: 175vmax;
 	height: 105vmax;
 	margin-left: -87.5vmax;
-	background: radial-gradient(closest-side, rgba(255, 168, 74, .5), rgba(255, 112, 62, .18) 46%, transparent 72%);
+	background: radial-gradient(closest-side, var(--sun-a), var(--sun-b) 46%, transparent 72%);
 	opacity: .3;
 	opacity: calc(.25 + var(--glow) * .75);
 	animation: breathe 11s ease-in-out infinite;
@@ -94,7 +163,7 @@ body {
 	right: 0;
 	bottom: 0;
 	height: 30vh;
-	background: linear-gradient(180deg, transparent, rgba(255, 138, 72, .1) 62%, rgba(255, 176, 96, .24));
+	background: linear-gradient(180deg, transparent, var(--horizon-a) 62%, var(--horizon-b));
 }
 
 @keyframes twinkle {
@@ -229,8 +298,8 @@ body {
 	background: #17122a;
 	background: var(--card-bottom);
 	box-shadow:
-		0 16px 26px -18px rgba(0, 0, 0, .95),
-		0 0 0 1px rgba(255, 255, 255, .07);
+		0 16px 26px -18px var(--card-shadow),
+		0 0 0 1px var(--card-ring);
 	transition: box-shadow .5s;
 }
 
@@ -375,10 +444,10 @@ body {
 		/* Warm at the top, cool at the bottom, like the two card halves. */
 		background-image: linear-gradient(
 			180deg,
-			#fffaf3 0%,
-			#ffe9c4 49.6%,
-			#e2d6ff 50.4%,
-			#c3b3ee 100%
+			var(--digit-1) 0%,
+			var(--digit-2) 49.6%,
+			var(--digit-3) 50.4%,
+			var(--digit-4) 100%
 		);
 		-webkit-background-clip: text;
 		background-clip: text;
@@ -390,13 +459,13 @@ body {
 /* The last seconds before the equinox: the clock turns gold. */
 #app.is-imminent .card {
 	box-shadow:
-		0 16px 26px -18px rgba(0, 0, 0, .95),
-		0 0 0 1px rgba(255, 195, 92, .5),
-		0 0 42px -6px rgba(255, 170, 70, .55);
+		0 16px 26px -18px var(--card-shadow),
+		0 0 0 1px var(--imminent-ring),
+		0 0 42px -6px var(--imminent-glow);
 }
 
 #app.is-imminent .digit::before {
-	filter: drop-shadow(0 0 12px rgba(255, 178, 72, .8));
+	filter: drop-shadow(0 0 12px var(--digit-glow));
 }
 
 #app.is-imminent .sky__glow {
@@ -416,7 +485,7 @@ body {
 	width: 100%;
 	height: 5px;
 	border-radius: 999px;
-	background: rgba(255, 255, 255, .09);
+	background: var(--track);
 	overflow: hidden;
 }
 
@@ -425,7 +494,8 @@ body {
 	width: 100%;
 	height: 100%;
 	border-radius: 999px;
-	background: linear-gradient(90deg, #7c9cff, #ffc35c);
+	background: var(--track-from);
+	background: linear-gradient(90deg, var(--track-from), var(--track-to));
 	transform: scaleX(0);
 	transform: scaleX(var(--progress));
 	transform-origin: right center;
@@ -442,9 +512,9 @@ body {
 .banner {
 	margin: 0;
 	padding: .55rem 1.3rem;
-	border: 1px solid rgba(255, 195, 92, .45);
+	border: 1px solid var(--gold-border);
 	border-radius: 999px;
-	background: rgba(255, 195, 92, .12);
+	background: var(--gold-soft);
 	color: #ffc35c;
 	color: var(--gold);
 	font-size: .95rem;
@@ -601,7 +671,7 @@ body {
 				<div class="track" role="presentation"><span class="track__fill" id="progress"></span></div>
 				<p class="progress__note" id="progress-note">…</p>
 				<!-- https://fonts.google.com/icons?icon.query=Yard&icon.size=24&icon.color=%23e3e3e3&icon.platform=web&icon.style=Rounded -->
-				<svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#e3e3e344">
+				<svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="currentColor" opacity=".3">
 					<path d="M480-200q0-40-16.5-75.5T419-339q-25-25-55.5-40.5T298-398q-7-1-12 4t-4 12q3 35 18.5 65.5T341-261q28 28 63.5 44.5T480-200Zm37.5-224.5Q532-439 532-462v-4q6 5 13.5 7.5T562-456q23 0 38.5-15.5T616-510q0-17-8-29.5T586-558q14-6 22-18.5t8-29.5q0-23-15.5-38.5T562-660q-9 0-16.5 2.5T532-650v-6q0-23-14.5-37.5T480-708q-23 0-37.5 14.5T428-656v6q-6-5-13.5-7.5T398-660q-23 0-38.5 15.5T344-606q0 17 8 29.5t22 18.5q-14 6-22 18.5t-8 29.5q0 23 15.5 38.5T398-456q9 0 16.5-2.5T428-466v4q0 23 14.5 37.5T480-410q23 0 37.5-14.5Zm-97-74Q396-523 396-558t24.5-59.5Q445-642 480-642t59.5 24.5Q564-593 564-558t-24.5 59.5Q515-474 480-474t-59.5-24.5ZM480-200q40 0 75.5-16.5T619-261q25-25 40.5-55.5T678-382q1-7-4-12t-12-4q-35 3-65.5 18.5T541-339q-28 28-44.5 63.5T480-200Zm-288 68q-26 0-43-17t-17-43v-576q0-26 17-43t43-17h576q26 0 43 17t17 43v576q0 26-17 43t-43 17H192Zm0-28h576q12 0 22-10t10-22v-576q0-12-10-22t-22-10H192q-12 0-22 10t-10 22v576q0 12 10 22t22 10Zm-32 0v-640 640Z"/>
 				</svg>
 			</div>
