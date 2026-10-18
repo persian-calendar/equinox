@@ -1,5 +1,7 @@
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
+import java.util.Base64
+
 plugins {
     kotlin("multiplatform") version "2.4.21"
 }
@@ -49,13 +51,16 @@ val generateWebIcons = tasks.register("generateWebIcons") {
 
 // A single file build of the page: the scripts are copied into index.html so that publishing
 // means publishing one document, with no separate requests to get wrong and no chance of a
-// cached page running against a newer script.
+// cached page running against a newer script. The digits font goes in as well, as a data URL.
 //
 // It is a separate directory rather than an edit in place, so the normal distribution is left
 // as it is and this step stays repeatable. Only the JS target is handled: the Wasm build loads
 // a .wasm file of its own, which has to remain a separate request, while the JS bundle is
 // self-contained.
 val webStandaloneDir = layout.buildDirectory.dir("dist/js/standalone")
+
+// Four kilobytes, small enough to travel inside the page.
+val webFont = "MarkaziTextDigits-VariableFont_wght.ttf"
 
 val webStandalone = tasks.register<Sync>("webStandalone") {
     description = "Copy the JS distribution to a directory whose index.html holds the scripts"
@@ -80,17 +85,30 @@ val webStandalone = tasks.register<Sync>("webStandalone") {
             check(tag.containsMatchIn(text)) { "index.html has no <script src=\"$name\">" }
             text = text.replace(tag) { "<script>\n$code\t</script>\n" }
         }
+
+        // The font is the one asset left outside the document, and base64 is what makes it
+        // travel with it: nothing to request, nothing to fail, nothing for a stale cache to
+        // hold on to. It is swapped in for the file name the page asks for, in place.
+        val font = dir.resolve(webFont)
+        check(font.isFile) { "$webFont is missing from the distribution" }
+        val fontData = Base64.getEncoder().encodeToString(font.readBytes())
+        val fontUrl = "url('$webFont')"
+        check(text.contains(fontUrl)) { "index.html has no $fontUrl" }
+        text = text.replace(fontUrl, "url('data:font/ttf;base64,$fontData')")
+
         html.writeText(text)
 
-        // The two files are inside the page now, so they are neither published nor precached.
-        listOf("main.js", "web.js", "main.js.map", "web.js.map").forEach { dir.resolve(it).delete() }
+        // The files that are inside the page now are neither published nor precached.
+        val inlined = listOf("main.js", "web.js", webFont)
+        inlined.forEach { dir.resolve(it).delete() }
+        listOf("main.js.map", "web.js.map").forEach { dir.resolve(it).delete() }
         val worker = dir.resolve("sw.js")
         if (worker.isFile) {
             // The BUILD stamped into sw.js is left alone here: the deploy workflow puts the
             // commit in its place, since that is the only place where a revision is certain.
             worker.writeText(
                 worker.readText().lines()
-                    .filterNot { it.contains("'./main.js'") || it.contains("'./web.js'") }
+                    .filterNot { line -> inlined.any { line.contains("'./$it'") } }
                     .joinToString("\n")
             )
         }
