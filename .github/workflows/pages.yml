@@ -48,8 +48,8 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          # The single file build: the scripts are inside index.html, so the site is one
-          # document plus its icons, font, manifest and service worker.
+          # The single file build: the scripts and the font are inside index.html, so the site
+          # is one document plus its icons, manifest and service worker.
           path: web/build/dist/js/standalone
 
   deploy:

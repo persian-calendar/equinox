@@ -41,18 +41,21 @@ When the icons are regenerated, `rsvg-convert` (from `librsvg`) has to be instal
 ## A single file build
 
 `webStandalone` copies the JS distribution to `web/build/dist/js/standalone/` with `main.js`
-and `web.js` written into `index.html` instead of being loaded as separate files. Publishing
-that directory means publishing one document, with no separate script requests and no chance
-of a cached page running against a newer script.
+and `web.js` written into `index.html` instead of being loaded as separate files, and the
+digits font written in as a base64 `data:` URL instead of a file of its own. Publishing that
+directory means publishing one document, with no separate requests and no chance of a cached
+page running against a newer script.
 
 ```sh
 ./gradlew :web:webStandalone
 ```
 
 The task leaves the normal distribution alone, so `jsBrowserDistribution` still produces the
-separate files for development. Two things are adjusted in the copy: the source map comments
-go, since the maps are no longer files of their own, and `main.js` and `web.js` are dropped
-from the service worker's precache list, which no longer needs them.
+separate files for development. Three things are adjusted in the copy: the source map comments
+go, since the maps are no longer files of their own; the font file is dropped once its bytes
+are in the page, which at four kilobytes costs less than a request and has no cache entry to
+go stale; and all three are dropped from the service worker's precache list, which has nothing
+left to fetch for them.
 
 Only the JS target is handled. The Wasm build's glue loads a `.wasm` file of its own, and that
 has to stay a separate request, while the JS bundle is self-contained.
