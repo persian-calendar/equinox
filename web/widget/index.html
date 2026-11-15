@@ -1,0 +1,386 @@
+<!doctype html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>شمارش معکوس تا نوروز</title>
+<style>
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    padding: 24px 12px 32px;
+    background: linear-gradient(135deg, #060c12, #101c27);
+    color: #f5f8fa;
+    font-family: system-ui, sans-serif;
+    text-align: center;
+}
+.widget {
+    max-width: 440px;
+    margin: auto;
+}
+h1 {
+    margin: 0 0 8px;
+    color: #6ab2f2;
+    font-size: 26px;
+}
+.subtitle,
+.date,
+.note {
+    color: #a9bed1;
+    font-size: 13px;
+    line-height: 1.8;
+}
+.subtitle {
+    margin: 0 0 20px;
+}
+.clock {
+    display: flex;
+    direction: ltr;
+    justify-content: center;
+    gap: clamp(7px, 3vw, 18px);
+}
+.unit {
+    min-width: 0;
+}
+.number {
+    display: flex;
+    direction: ltr;
+    justify-content: center;
+    font-size: clamp(30px, 10.3vw, 48px);
+    font-weight: 100;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+    color: #f5f8fa;
+}
+.digit {
+    position: relative;
+    display: inline-block;
+    width: 0.65em;
+    height: 1.2em;
+    overflow: hidden;
+    --soft: cubic-bezier(0.256, 0.258, 0.181, 0.979);
+}
+.digit span {
+    position: absolute;
+    inset: 0;
+}
+.digit .old {
+    opacity: 0;
+}
+.digit.changing span {
+    animation:
+        roll-in 0.39s cubic-bezier(0.435, 0.835, 0.104, 1.327) var(--delay)
+            both,
+        grow 0.3s var(--soft) var(--delay) both,
+        fade-in 0.3s var(--soft) var(--delay) both,
+        blur-motion 0.39s ease-in-out var(--delay) both;
+}
+.digit.changing .old {
+    animation-name: roll-out, shrink, fade-out, blur-motion;
+}
+@keyframes roll-in {
+    from {
+        translate: 0 -0.59375em;
+    }
+    to {
+        translate: 0 0;
+    }
+}
+@keyframes roll-out {
+    from {
+        translate: 0 0;
+    }
+    to {
+        translate: 0 0.59375em;
+    }
+}
+@keyframes grow {
+    from {
+        scale: 0.3984;
+    }
+    to {
+        scale: 1;
+    }
+}
+@keyframes shrink {
+    from {
+        scale: 1;
+    }
+    to {
+        scale: 0.3984;
+    }
+}
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+@keyframes blur-motion {
+    0%,
+    70%,
+    100% {
+        filter: blur(0);
+    }
+    25% {
+        filter: blur(0.125em);
+    }
+}
+@supports (animation-timing-function: linear(0, 1)) {
+    .digit.changing span {
+        animation-timing-function:
+            linear(
+                0,
+                0.014 2.5%,
+                0.111 7.5%,
+                0.702 25%,
+                0.847 30%,
+                1.006 37.5%,
+                1.072 42.5%,
+                1.12 50%,
+                1.123 57.5%,
+                1.009 87.5%,
+                1
+            ),
+            var(--soft), var(--soft), ease-in-out;
+    }
+}
+.label {
+    margin-top: 5px;
+    color: #a9bed1;
+    font-size: 12px;
+}
+.track {
+    height: 5px;
+    margin: 22px auto 10px;
+    max-width: 320px;
+    background: #57748a;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.fill {
+    height: 100%;
+    width: 0;
+    margin-left: auto;
+    background: linear-gradient(270deg, #6ab2f2, #73c99a);
+    border-radius: 4px;
+}
+.date {
+    margin: 0;
+}
+.note {
+    margin: 8px 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+    .digit.changing .old {
+        animation: none;
+        visibility: hidden;
+    }
+    .digit.changing .new {
+        animation: none;
+    }
+}
+</style>
+<main class="widget" lang="fa" dir="rtl">
+    <h1>نوروز <span id="year"></span></h1>
+    <p class="subtitle">شمارش معکوس تا لحظهٔ تحویل سال</p>
+    <div class="clock" id="clock" role="timer" aria-live="off">
+        <div class="unit">
+            <div class="number" id="days"></div>
+            <div class="label">روز</div>
+        </div>
+        <div class="unit">
+            <div class="number" id="hours"></div>
+            <div class="label">ساعت</div>
+        </div>
+        <div class="unit">
+            <div class="number" id="minutes"></div>
+            <div class="label">دقیقه</div>
+        </div>
+        <div class="unit">
+            <div class="number" id="seconds"></div>
+            <div class="label">ثانیه</div>
+        </div>
+    </div>
+    <div class="track"><div class="fill" id="progress"></div></div>
+    <p class="date" id="date"></p>
+    <p class="note" id="note" hidden>نوروز مبارک!</p>
+</main>
+<script>
+// March equinox from the project's earlier Meeus-based algorithm, in UTC milliseconds.
+const terms = [
+    [485, 324.96, 1934.136],
+    [203, 337.23, 32964.467],
+    [199, 342.08, 20.186],
+    [182, 27.85, 445267.112],
+    [156, 73.14, 45036.886],
+    [136, 171.52, 22518.443],
+    [77, 222.54, 65928.934],
+    [74, 296.72, 3034.906],
+    [70, 243.58, 9037.513],
+    [58, 119.81, 33718.147],
+    [52, 297.17, 150.678],
+    [50, 21.02, 2281.226],
+    [45, 247.54, 29929.562],
+    [44, 325.15, 31555.956],
+    [29, 60.93, 4443.417],
+    [18, 155.12, 67555.328],
+    [17, 288.79, 4562.452],
+    [16, 198.04, 62894.029],
+    [14, 199.76, 31436.921],
+    [12, 95.39, 14577.848],
+    [12, 287.11, 31931.756],
+    [12, 320.81, 34777.259],
+    [9, 227.73, 1222.114],
+    [8, 15.45, 16859.074],
+];
+function equinox(year) {
+    const y = (year - 2000) / 1000;
+    const mean =
+        2451623.80984 +
+        (365242.37404 + (0.05169 + (-0.00411 - 0.00057 * y) * y) * y) * y;
+    const t = (mean - 2451545) / 36525,
+        radians = Math.PI / 180;
+    const w = (35999.373 * t - 2.47) * radians;
+    const sum = terms.reduce(
+        (s, [a, b, c]) => s + a * Math.cos((b + c * t) * radians),
+        0,
+    );
+    const jd =
+        mean +
+        (0.00001 * sum) /
+            (1 + 0.0334 * Math.cos(w) + 0.0007 * Math.cos(2 * w)) -
+        (66 + year - 2000) / 86400;
+    return Math.round((jd - 2440587.5) * 86400000);
+}
+const fa = (n) => n.toLocaleString("fa", { useGrouping: false });
+const two = (n) =>
+    String(n)
+        .padStart(2, "0")
+        .split("")
+        .map((d) => fa(Number(d)))
+        .join("");
+const groups = ["days", "hours", "minutes", "seconds"].map((id, i) => {
+    const parent = document.getElementById(id);
+    return Array.from({ length: i ? 2 : 3 }, () => {
+        const digit = document.createElement("span");
+        digit.className = "digit";
+        digit.setAttribute("aria-hidden", "true");
+        digit.innerHTML =
+            '<span class="old"></span><span class="new"></span>';
+        parent.appendChild(digit);
+        return digit;
+    });
+});
+let targetYear = new Date().getUTCFullYear(),
+    target = equinox(targetYear);
+let previous = equinox(targetYear - 1);
+function renderTarget() {
+    document.getElementById("year").textContent = fa(targetYear - 621);
+    const tehran = new Date(target + 12600000);
+    const date = tehran.toLocaleDateString("fa", {
+        calendar: "persian",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+    });
+    document.getElementById("date").textContent =
+        "تحویل سال: " +
+        date +
+        "، ساعت " +
+        two(tehran.getUTCHours()) +
+        ":" +
+        two(tehran.getUTCMinutes()) +
+        ":" +
+        two(tehran.getUTCSeconds()) +
+        " به وقت تهران";
+}
+function nextTarget() {
+    previous = target;
+    target = equinox(++targetYear);
+    renderTarget();
+}
+// Keep the just-passed equinox visible briefly, including when opened during the celebration.
+if (Date.now() >= target + 20000) nextTarget();
+else renderTarget();
+function show(group, value, unpadded = false) {
+    const leading = unpadded ? group.length - String(value).length : 0;
+    const digits = String(value)
+        .padStart(group.length, "0")
+        .split("")
+        .map((d) => fa(Number(d)));
+    const changed = group
+        .map((element, i) =>
+            i >= leading &&
+            element.querySelector(".new").textContent !== digits[i]
+                ? i
+                : -1,
+        )
+        .filter((i) => i >= 0);
+    group.forEach((element, i) => {
+        element.style.display = i < leading ? "none" : "";
+        if (i < leading) return;
+        const current = element.querySelector(".new"),
+            old = element.querySelector(".old");
+        const glyph = digits[i];
+        if (current.textContent === glyph) return;
+        old.textContent = current.textContent;
+        current.textContent = glyph;
+        if (!old.textContent) return;
+        const order = changed.indexOf(i);
+        element.style.setProperty(
+            "--delay",
+            (changed.length > 1
+                ? (150 * order) / (changed.length - 1)
+                : 0) + "ms",
+        );
+        element.classList.remove("changing");
+        void element.offsetWidth;
+        element.classList.add("changing");
+    });
+}
+function tick() {
+    const now = Date.now();
+    while (now >= target + 20000) nextTarget();
+    const remaining = Math.max(0, Math.ceil((target - now) / 1000));
+    const values = [
+        Math.floor(remaining / 86400),
+        Math.floor(remaining / 3600) % 24,
+        Math.floor(remaining / 60) % 60,
+        remaining % 60,
+    ];
+    groups.forEach((group, i) => show(group, values[i], i === 0));
+    document
+        .getElementById("clock")
+        .setAttribute(
+            "aria-label",
+            values
+                .map(
+                    (value, i) =>
+                        fa(value) +
+                        " " +
+                        ["روز", "ساعت", "دقیقه", "ثانیه"][i],
+                )
+                .join(" و "),
+        );
+    const progress = Math.max(
+        0,
+        Math.min(1, (now - previous) / (target - previous)),
+    );
+    document.getElementById("progress").style.width = progress * 100 + "%";
+    document.getElementById("note").hidden = now < target;
+}
+tick();
+setInterval(tick, 250);
+</script>

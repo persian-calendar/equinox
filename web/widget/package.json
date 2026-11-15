@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "scripts": {
+    "format": "node format.mjs",
+    "optimize": "mkdir -p dist && html-minifier-terser --collapse-whitespace --remove-comments --minify-css true --minify-js true -o dist/index.html index.html",
+    "check": "node check.mjs"
+  },
+  "devDependencies": {
+    "html-minifier-terser": "7.2.0",
+    "prettier": "3.6.2"
+  }
+}

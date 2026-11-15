@@ -76,11 +76,10 @@
 		return { show: show, getValue: getValue };
 	}
 
-	/* A group of cards showing one zero-padded number, e.g. 007 days. */
-	function createDigits(ids) {
-		var cards = ids.map(function (id) {
-			return createDigit(element(id));
-		});
+	/* A group of cards showing one number. */
+	function createDigits(ids, unpadded) {
+		var elements = ids.map(element);
+		var cards = elements.map(createDigit);
 
 		function digitsOf(number) {
 			var out = [];
@@ -94,12 +93,13 @@
 
 		function show(number) {
 			var digits = digitsOf(number);
+			var leading = unpadded ? cards.length - String(number).length : 0;
 			/* The columns start left to right, most significant first, dividing one
 			   shared budget between the columns that actually change. The first paint
 			   rolls nothing at all, because no card has a value to replace yet. */
 			var changing = digits
 				.map(function (digit, index) {
-					return digit === cards[index].getValue() ? -1 : index;
+					return index < leading || digit === cards[index].getValue() ? -1 : index;
 				})
 				.filter(function (index) {
 					return index >= 0;
@@ -107,6 +107,8 @@
 			var step = changing.length > 1 ? CASCADE_MILLIS / (changing.length - 1) : 0;
 
 			digits.forEach(function (digit, index) {
+				elements[index].hidden = index < leading;
+				if (elements[index].hidden) return;
 				var order = changing.indexOf(index);
 				cards[index].show(digit, order < 0 ? 0 : order * step);
 			});
@@ -160,7 +162,7 @@
 		var instantLabel = element('instant');
 		var progressNote = element('progress-note');
 
-		var days = createDigits(['days-2', 'days-1', 'days-0']);
+		var days = createDigits(['days-2', 'days-1', 'days-0'], true);
 		var hours = createDigits(['hours-1', 'hours-0']);
 		var minutes = createDigits(['minutes-1', 'minutes-0']);
 		var seconds = createDigits(['seconds-1', 'seconds-0']);
