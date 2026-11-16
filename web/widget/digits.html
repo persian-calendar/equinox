@@ -1,0 +1,301 @@
+<meta name="color-scheme" content="light dark">
+<style>
+body { font-family: system-ui, sans-serif; }
+.preview {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0;
+    direction: ltr;
+    text-align: center;
+}
+.preview svg {
+    width: clamp(18px, 8vw, 31px);
+    height: 48px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: inherit;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.preview small { display: block; }
+</style>
+<label>
+    Stroke
+    <input id="weight" type="range" min="0.7" max="8" step="0.1" value="1.5">
+</label>
+<div id="preview" class="preview" role="img" aria-label="۳۶۵ روز، ۰۴ ساعت، ۳۹ دقیقه، ۵۸ ثانیه"></div>
+<div id="western-preview" class="preview" role="img" aria-label="365 days, 04 hours, 39 minutes, 58 seconds"></div>
+<svg xmlns="http://www.w3.org/2000/svg" id="root">
+    <style>
+#digits {
+    fill: none;
+    stroke: canvastext;
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+#digits .box {
+    fill: none;
+    stroke: canvastext;
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+    opacity: .5;
+}
+#digits .guide {
+    fill: none;
+    stroke: canvastext;
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+    opacity: .4;
+}
+#digits text {
+    fill: canvastext;
+    stroke: none;
+    font: 10px system-ui, sans-serif;
+}
+    </style>
+    <g id="digits" />
+    <script type="text/javascript"><![CDATA[
+const radius = 20;
+const W = radius * 4;
+const H = W * 3 / 2;
+const move = ({ x, y }) => ['M', x, y];
+const line = ({ angle, length }) => {
+    const resolved = {
+        N: 270,
+        NNE: 292.5,
+        NE: 315,
+        ENE: 337.5,
+        E: 0,
+        ESE: 22.5,
+        SE: 45,
+        SSE: 67.5,
+        S: 90,
+        SSW: 112.5,
+        SW: 135,
+        WSW: 157.5,
+        W: 180,
+        WNW: 202.5,
+        NW: 225,
+        NNW: 247.5,
+    }[angle];
+    const rad = (resolved === undefined ? angle : resolved) * Math.PI / 180;
+    return ['l', length * Math.cos(rad), length * Math.sin(rad)];
+};
+const arc = ({ r, start, sweep }) => {
+    if (Math.abs(sweep) === 360) {
+        const half = sweep / 2;
+        return [
+            ...arc({ r, start, sweep: half }),
+            ...arc({ r, start: start + half, sweep: half }),
+        ];
+    }
+    const degToRad = Math.PI / 180;
+    const x1 = r * Math.cos(start * degToRad);
+    const y1 = r * Math.sin(start * degToRad);
+    const x2 = r * Math.cos((start + sweep) * degToRad);
+    const y2 = r * Math.sin((start + sweep) * degToRad);
+    return [
+        'a', r, r, 0,
+        Math.abs(sweep) > 180 ? 1 : 0,
+        sweep > 0 ? 1 : 0,
+        x2 - x1, y2 - y1,
+    ];
+};
+const smallerRadius = radius - 3;
+const arabic = {
+    '0': [
+        move({ x: 23, y: 47 }),
+        arc({ r: smallerRadius, start: 180, sweep: 180 }),
+        line({ angle: 'S', length: 26 }),
+        arc({ r: smallerRadius, start: 0, sweep: 180 }),
+        ['z'],
+    ],
+    '1': [
+        move({ x: W / 2, y: H * 3 / 4 }),
+        line({ angle: 'N', length: H / 2 }),
+        line({ angle: 130, length: 28 }),
+        move({ x: 22, y: 90 }),
+        line({ angle: 'E', length: 35}),
+    ],
+    '2': [
+        move({ x: 23.5, y: 46 }),
+        arc({ r: smallerRadius - 1, start: 180, sweep: 220 }),
+        line({ angle: 130, length: 44 }),
+        line({ angle: 'E', length: 34 }),
+    ],
+    '3': [
+        move({ x: 30, y: 30 }),
+        line({ angle: 'E', length: radius }),
+        line({ angle: 'SSW', length: 28 }),
+        arc({ r: smallerRadius, start: 270, sweep: 220 }),
+    ],
+    '4': [
+        move({ x: 55, y: 75 }),
+        line({ angle: 'W', length: 32 }),
+        ['L', 43, 30],
+        line({ angle: 'S', length: 60 }),
+    ],
+    '5': [
+        move({ x: 23, y: 78.81 }),
+        arc({ r: smallerRadius, start: 160, sweep: -280 }),
+        line({ angle: 'NNE', length: 30.61 }),
+        line({ angle: 'E', length: 19 }),
+    ],
+    '6': [
+        move({ x: 25, y: 67.19 }),
+        arc({ r: smallerRadius, start: 200, sweep: 360 }),
+        line({ angle: 290, length: 37.19 / Math.sin(70 * Math.PI / 180) }),
+    ],
+    '7': [
+        move({ x: 23, y: H / 4 }),
+        line({ angle: 'E', length: 34 }),
+        line({ angle: 'SSW', length: 60 / Math.sin(67.5 * Math.PI / 180) }),
+    ],
+    '8': [
+        move({ x: 40, y: 57 }),
+        arc({ r: smallerRadius - 3.5, start: 90, sweep: 360 }),
+        arc({ r: radius - 3.5, start: 270, sweep: 360 }),
+    ],
+    '9': [
+        move({ x: 56, y: 53 }),
+        arc({ r: smallerRadius, start: 20, sweep: 360 }),
+        line({ angle: 110, length: 37 / Math.sin(70 * Math.PI / 180) }),
+    ],
+};
+
+// All full-height digits share the 30–90 guides; ۰ is a centered dot.
+const radians = Math.PI / 180;
+const stemAngle = -27.5;
+const stemRadius = 60 / (Math.sin(350.5 * radians) - Math.sin(stemAngle * radians));
+const stem = (start = stemAngle, height = 60, reflected = false) => {
+    const end = Math.asin(Math.sin(start * radians) + height / stemRadius) / radians;
+    return arc({
+        r: stemRadius,
+        start: reflected ? 180 - start : start,
+        sweep: reflected ? start - end : end - start,
+    });
+};
+const nineRadius = 12;
+const nineY = 42 + nineRadius * Math.sin(stemAngle * radians);
+const sixRadius = 14;
+const sixStart = -60;
+const sixEnd = 50;
+const sixY = 44 + sixRadius * Math.sin(sixEnd * radians);
+const fiveSide = (reflected) => {
+    const sideArc = ({ r, start, sweep }) => arc({
+        r,
+        start: reflected ? 180 - start : start,
+        sweep: reflected ? -sweep : sweep,
+    });
+    const upper = sideArc({ r: 82.53, start: -137.12, sweep: -33.71 });
+    const lower = sideArc({ r: 14.05, start: -166.79, sweep: -92.24 });
+    const innerRadius = Math.abs(upper.at(-2) + lower.at(-2));
+    return [
+        move({ x: 40, y: 30 }),
+        upper,
+        lower,
+        sideArc({ r: innerRadius, start: 90, sweep: -90 }),
+    ];
+};
+const persian = {
+    '۰': [
+        move({ x: 50, y: 60 }),
+        arc({ r: 10, start: 0, sweep: 360 }),
+    ],
+    '۱': [move({ x: 27.5, y: 30 }), stem()],
+    '۲': [
+        move({ x: 55, y: 30 }),
+        arc({ r: 15, start: 0, sweep: 152.5 }),
+        stem(stemAngle, 60 - 15 * Math.sin(152.5 * radians)),
+    ],
+    '۳': [
+        move({ x: 60, y: 30 }),
+        arc({ r: 10, start: 10, sweep: 160 }),
+        arc({ r: 10, start: 10, sweep: 142.5 }),
+        stem(stemAngle, 60 - 10 * (Math.sin(152.5 * radians) - Math.sin(10 * radians))),
+    ],
+    '۴': [
+        move({ x: 27.5, y: 30 }),
+        stem(),
+        move({ x: 34, y: 44 }),
+        arc({ r: 20.95, start: 140.07, sweep: -78.36 }),
+        move({ x: 44, y: 51 }),
+        arc({ r: 11.32, start: 116.28, sweep: 100.95 }),
+        arc({ r: 13.46, start: -136.21, sweep: 79 }),
+    ],
+    '۵': [...fiveSide(false), ...fiveSide(true)],
+    '۶': [
+        move({
+            x: 42 + sixRadius * Math.cos(sixStart * radians),
+            y: 44 + sixRadius * Math.sin(sixStart * radians),
+        }),
+        arc({ r: sixRadius, start: sixStart, sweep: sixEnd - 360 - sixStart }),
+        stem(-45, 90 - sixY, true),
+    ],
+    '۷': [
+        move({ x: 20, y: 30 }),
+        stem(),
+        arc({ r: stemRadius, start: 190, sweep: 18 }),
+    ],
+    '۸': [
+        move({ x: 20, y: 90 }),
+        arc({ r: 201.66, start: 27, sweep: -18 }),
+        arc({ r: 201.66, start: 169.5, sweep: -18 }),
+    ],
+    '۹': [
+        move({ x: 34 + nineRadius * Math.cos(stemAngle * radians), y: nineY }),
+        arc({ r: nineRadius, start: stemAngle, sweep: 360 }),
+        stem(stemAngle, 90 - nineY),
+    ],
+};
+
+// Render
+const guideLine = ({ x1, y1, x2, y2 }) => [
+    '<line class="guide" x1="', x1, '" y1="', y1, '" x2="', x2, '" y2="', y2, '"/>',
+];
+const guides = [
+    guideLine({ x1: 0, y1: H / 4, x2: W, y2: H / 4 }),
+    guideLine({ x1: 0, y1: H / 2, x2: W, y2: H / 2 }),
+    guideLine({ x1: 0, y1: 3 * H / 4, x2: W, y2: 3 * H / 4 }),
+    guideLine({ x1: W / 4, y1: 0, x2: W / 4, y2: H }),
+    guideLine({ x1: W / 2, y1: 0, x2: W / 2, y2: H }),
+    guideLine({ x1: 3 * W / 4, y1: 0, x2: 3 * W / 4, y2: H }),
+];
+const COLS = 5;
+const original = Object.values(arabic);
+const study = Object.values(persian);
+const ROWS = Math.ceil((original.length + study.length) / COLS);
+const boxHeight = n => radius + (H + radius) * n;
+const boxWidth = n => radius + (W + radius) * n;
+document.getElementById('root').setAttribute('viewBox', `0 0 ${boxWidth(COLS)} ${boxHeight(ROWS)}`);
+const headings = [
+    [0, 'Western Arabic numerals'],
+    [2, 'Persian numerals'],
+].map(([row, text]) => `<text x="${radius}" y="${boxHeight(row) - 7}">${text}</text>`);
+const cells = [...original, ...study].map((p, i) => [
+    '<g transform="translate(', boxWidth(i % COLS), ',', boxHeight(Math.floor(i / COLS)), ')">',
+    '<rect class="box" width="', W, '" height="', H, '"/>',
+    ...guides,
+    '<path d="', p, '"/>',
+    '</g>',
+]).flat(3).join(' ');
+document.getElementById('digits').innerHTML = [...headings, cells].join('');
+[
+    ['preview', persian, [['۳۶۵', 'روز'], ['۰۴', 'ساعت'], ['۳۹', 'دقیقه'], ['۵۸', 'ثانیه']]],
+    ['western-preview', arabic, [['365', 'days'], ['04', 'hours'], ['39', 'minutes'], ['58', 'seconds']]],
+].forEach(([id, alphabet, groups]) => {
+    document.getElementById(id).innerHTML = groups.map(([value, label]) => `<div>${[...value].map(digit =>
+        `<svg viewBox="0 15 80 90" aria-hidden="true"><path d="${alphabet[digit].flat().join(' ')}"/></svg>`,
+    ).join('')}<small>${label}</small></div>`).join('');
+});
+const weight = document.getElementById('weight');
+const setWeight = () => {
+    document.getElementById('digits').style.strokeWidth = weight.value;
+    document.querySelectorAll('.preview').forEach(element => element.style.strokeWidth = weight.value);
+};
+weight.addEventListener('input', setWeight);
+setWeight();
+]]></script>
+</svg>

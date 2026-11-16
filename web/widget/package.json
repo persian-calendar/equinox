@@ -2,6 +2,8 @@
   "private": true,
   "scripts": {
     "format": "node format.mjs",
+    "lint:digits": "node --test digits-lint.test.mjs digits-metrics.test.mjs && node digits-lint.mjs",
+    "report:digits": "node digits-report.mjs",
     "optimize": "mkdir -p dist && html-minifier-terser --collapse-whitespace --remove-comments --minify-css true --minify-js true -o dist/index.html index.html",
     "check": "node check.mjs"
   },
